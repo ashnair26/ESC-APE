@@ -7,6 +7,7 @@ allowing LLMs to access all the tools from different servers without having
 to connect to each one separately.
 """
 
+import os
 from typing import List, Optional
 
 from mcp.server.fastmcp import FastMCP
@@ -18,8 +19,20 @@ from servers.sanity.server import mcp as sanity_mcp
 from servers.privy.server import mcp as privy_mcp
 from servers.base.server import mcp as base_mcp
 
+# Import authentication utilities
+from core.auth import setup_auth_middleware
+
 # Initialize the unified MCP server
 mcp = FastMCP("ESCAPE Unified Server")
+
+# Set up authentication middleware
+skip_auth = os.environ.get("SKIP_AUTH", "false").lower() == "true"
+setup_auth_middleware(
+    mcp_server=mcp,
+    jwt_secret=os.environ.get("JWT_SECRET"),
+    required_scopes=["mcp:access"],
+    skip_auth=skip_auth
+)
 
 
 def import_tools_from_server(source_mcp: FastMCP) -> List:
@@ -65,18 +78,4 @@ def register_tools_from_server(source_mcp: FastMCP, prefix: Optional[str] = None
         mcp.register_tool(
             name=tool_name,
             func=tool.func,
-            description=tool.description
-        )
-
-
-# Register tools from all individual servers
-register_tools_from_server(supabase_mcp, prefix=None)
-register_tools_from_server(git_mcp, prefix=None)
-register_tools_from_server(sanity_mcp, prefix=None)
-register_tools_from_server(privy_mcp, prefix=None)
-register_tools_from_server(base_mcp, prefix=None)
-
-
-if __name__ == "__main__":
-    # Run the server with stdio transport
-    mcp.run()
+            description=tool.descrip
