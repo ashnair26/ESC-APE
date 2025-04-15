@@ -212,3 +212,56 @@ class TestPrivyIntegration:
                 assert "privy_delete_user" in tool_names
                 assert "privy_create_auth_token" in tool_names
                 assert "privy_revoke_auth_token" in tool_names
+
+
+@pytest.mark.integration
+class TestBaseIntegration:
+    """Integration tests for the BASE blockchain MCP server."""
+
+    @pytest.mark.asyncio
+    async def test_base_server_initialization(self):
+        """Test that the BASE blockchain MCP server initializes correctly."""
+        # Mock the stdio_client to avoid actually starting the server
+        mock_read = AsyncMock()
+        mock_write = AsyncMock()
+
+        # Mock the ClientSession.initialize method
+        with patch("mcp.client.stdio.stdio_client", AsyncMock(return_value=(mock_read, mock_write))), \
+             patch.object(ClientSession, "initialize", AsyncMock()), \
+             patch.object(ClientSession, "list_tools", AsyncMock(return_value=[
+                 {"name": "base_get_balance"},
+                 {"name": "base_get_transaction"},
+                 {"name": "base_get_block"},
+                 {"name": "base_call_contract_function"},
+                 {"name": "base_send_transaction"},
+                 {"name": "base_send_contract_transaction"},
+                 {"name": "base_get_gas_price"},
+                 {"name": "base_is_contract"},
+                 {"name": "base_get_logs"}
+             ])):
+
+            # Create server parameters for stdio connection
+            server_params = StdioServerParameters(
+                command="python",
+                args=["-m", "servers.base.server"],
+                env=None,
+            )
+
+            async with ClientSession(mock_read, mock_write) as session:
+                # Initialize the connection
+                await session.initialize()
+
+                # List available tools
+                tools = await session.list_tools()
+
+                # Check that the expected tools are available
+                tool_names = [tool["name"] for tool in tools]
+                assert "base_get_balance" in tool_names
+                assert "base_get_transaction" in tool_names
+                assert "base_get_block" in tool_names
+                assert "base_call_contract_function" in tool_names
+                assert "base_send_transaction" in tool_names
+                assert "base_send_contract_transaction" in tool_names
+                assert "base_get_gas_price" in tool_names
+                assert "base_is_contract" in tool_names
+                assert "base_get_logs" in tool_names
