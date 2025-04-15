@@ -5,7 +5,9 @@ Example usage of the BASE blockchain MCP server.
 
 import asyncio
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List
+
+from core.utils import chunk_data, reassemble_chunks
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -19,20 +21,20 @@ async def run_example():
         args=["-m", "servers.base.server"],  # Module to run
         env=None,  # Use current environment variables
     )
-    
+
     print("Connecting to BASE Blockchain MCP server...")
-    
+
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             # Initialize the connection
             await session.initialize()
-            
+
             print("Connected to BASE Blockchain MCP server!")
-            
+
             # List available tools
             tools = await session.list_tools()
             print(f"\nAvailable tools: {[tool.name for tool in tools]}")
-            
+
             # Example: Get ETH balance
             print("\n--- Getting ETH balance ---")
             balance_result = await session.call_tool(
@@ -43,7 +45,7 @@ async def run_example():
                 }
             )
             print_json(balance_result)
-            
+
             # Example: Get transaction details
             print("\n--- Getting transaction details ---")
             tx_result = await session.call_tool(
@@ -54,7 +56,7 @@ async def run_example():
                 }
             )
             print_json(tx_result)
-            
+
             # Example: Get block details
             print("\n--- Getting block details ---")
             block_result = await session.call_tool(
@@ -64,50 +66,78 @@ async def run_example():
                     "network": "sepolia"
                 }
             )
-            print_json(block_result)
-            
+
+            # Check if the response is chunked
+            block_result_json = json.loads(block_result)
+            if block_result_json.get("chunked"):
+                print(f"Block data is too large, split into {block_result_json['total_chunks']} chunks")
+                print(block_result_json["message"])
+
+                # Retrieve all chunks
+                chunks = []
+                for i in range(block_result_json["total_chunks"]):
+                    print(f"Retrieving chunk {i+1} of {block_result_json['total_chunks']}...")
+                    chunk_result = await session.call_tool(
+                        "base_get_block",
+                        arguments={
+                            "block_identifier": "latest",
+                            "network": "sepolia",
+                            "chunk_index": i,
+                            "total_chunks": block_result_json["total_chunks"]
+                        }
+                    )
+                    chunk_data = json.loads(chunk_result)["data"]
+                    chunks.append(chunk_data)
+
+                # Reassemble the chunks
+                complete_data = reassemble_chunks(chunks)
+                print("Reassembled block data:")
+                print_json(json.dumps(complete_data))
+            else:
+                print_json(block_result)
+
             # Example: Call a contract function
             print("\n--- Calling a contract function ---")
             # ERC-20 token ABI (partial)
             erc20_abi = json.dumps([
                 {
-                    "constant": true,
+                    "constant": True,
                     "inputs": [],
                     "name": "name",
                     "outputs": [{"name": "", "type": "string"}],
-                    "payable": false,
+                    "payable": False,
                     "stateMutability": "view",
                     "type": "function"
                 },
                 {
-                    "constant": true,
+                    "constant": True,
                     "inputs": [],
                     "name": "symbol",
                     "outputs": [{"name": "", "type": "string"}],
-                    "payable": false,
+                    "payable": False,
                     "stateMutability": "view",
                     "type": "function"
                 },
                 {
-                    "constant": true,
+                    "constant": True,
                     "inputs": [],
                     "name": "decimals",
                     "outputs": [{"name": "", "type": "uint8"}],
-                    "payable": false,
+                    "payable": False,
                     "stateMutability": "view",
                     "type": "function"
                 },
                 {
-                    "constant": true,
+                    "constant": True,
                     "inputs": [{"name": "_owner", "type": "address"}],
                     "name": "balanceOf",
                     "outputs": [{"name": "balance", "type": "uint256"}],
-                    "payable": false,
+                    "payable": False,
                     "stateMutability": "view",
                     "type": "function"
                 }
             ])
-            
+
             call_result = await session.call_tool(
                 "base_call_contract_function",
                 arguments={
@@ -118,7 +148,61 @@ async def run_example():
                 }
             )
             print_json(call_result)
-            
+
+            # Example: Call a contract function with a large ABI (chunked)
+            print("\n--- Calling a contract function with a large ABI (chunked) ---")
+            # Generate a large ABI for demonstration purposes
+            large_abi = []
+            for i in range(1000):  # Create a large ABI with 1000 functions
+                large_abi.append({
+                    "constant": True,
+                    "inputs": [],
+                    "name": f"function{i}",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": False,
+                    "stateMutability": "view",
+                    "type": "function"
+                })
+
+            # Add the actual function we want to call
+            large_abi.append({
+                "constant": True,
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"name": "", "type": "string"}],
+                "payable": False,
+                "stateMutability": "view",
+                "type": "function"
+            })
+
+            # Convert to JSON string
+            large_abi_json = json.dumps(large_abi)
+
+            # Chunk the ABI
+            abi_chunks = chunk_data(large_abi_json, chunk_size=10000)  # 10KB chunks
+            print(f"Large ABI size: {len(large_abi_json)} bytes, split into {len(abi_chunks)} chunks")
+
+            # Send each chunk
+            for i, chunk in enumerate(abi_chunks):
+                print(f"Sending ABI chunk {i+1} of {len(abi_chunks)}...")
+                chunk_result = await session.call_tool(
+                    "base_call_contract_function",
+                    arguments={
+                        "contract_address": "0x1234567890123456789012345678901234567890",
+                        "abi": chunk,
+                        "function_name": "symbol",
+                        "network": "sepolia",
+                        "abi_chunk_index": i,
+                        "abi_total_chunks": len(abi_chunks)
+                    }
+                )
+                print_json(chunk_result)
+
+                # If this is the last chunk, the result should be available
+                if i == len(abi_chunks) - 1:
+                    print("All ABI chunks sent, final result:")
+                    print_json(chunk_result)
+
             # Example: Get gas price
             print("\n--- Getting gas price ---")
             gas_result = await session.call_tool(
@@ -128,7 +212,7 @@ async def run_example():
                 }
             )
             print_json(gas_result)
-            
+
             # Example: Check if address is a contract
             print("\n--- Checking if address is a contract ---")
             contract_result = await session.call_tool(
@@ -139,7 +223,7 @@ async def run_example():
                 }
             )
             print_json(contract_result)
-            
+
             # Example: Get logs
             print("\n--- Getting logs ---")
             logs_result = await session.call_tool(
@@ -152,10 +236,10 @@ async def run_example():
                 }
             )
             print_json(logs_result)
-            
+
             # Note: The following examples require a private key and would send actual transactions
             # They are commented out for safety
-            
+
             """
             # Example: Send a transaction
             print("\n--- Sending a transaction ---")
@@ -168,7 +252,7 @@ async def run_example():
                 }
             )
             print_json(send_result)
-            
+
             # Example: Send a contract transaction
             print("\n--- Sending a contract transaction ---")
             contract_tx_result = await session.call_tool(

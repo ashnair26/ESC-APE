@@ -92,3 +92,43 @@ def format_error_message(error: Exception) -> str:
         A formatted error message.
     """
     return f"Error: {type(error).__name__} - {str(error)}"
+
+
+def chunk_data(data: Union[str, Dict, List], chunk_size: int = 100000) -> List[str]:
+    """
+    Split large data into chunks.
+
+    Args:
+        data: The data to chunk. Can be a string, dict, or list.
+        chunk_size: The maximum size of each chunk in characters.
+
+    Returns:
+        A list of chunks as strings.
+    """
+    # Convert data to string if it's not already
+    if not isinstance(data, str):
+        data = json.dumps(data)
+
+    # Split the data into chunks
+    return [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+
+
+def reassemble_chunks(chunks: List[str]) -> Union[str, Dict, List]:
+    """
+    Reassemble chunks into the original data.
+
+    Args:
+        chunks: The list of chunks to reassemble.
+
+    Returns:
+        The reassembled data. If the data is valid JSON, it will be parsed into a dict or list.
+        Otherwise, it will be returned as a string.
+    """
+    # Join the chunks
+    data = ''.join(chunks)
+
+    # Try to parse as JSON
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
+        return data
