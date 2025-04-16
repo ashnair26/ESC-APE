@@ -1,0 +1,427 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { 
+  HomeIcon, 
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon
+} from '@heroicons/react/24/outline';
+
+// Component imports will go here as we create them
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Alert from '@/components/ui/Alert';
+import ProgressCard from '@/components/ui/ProgressCard';
+import Stat from '@/components/ui/Stat';
+import BentoGrid from '@/components/ui/BentoGrid';
+import BentoBox from '@/components/ui/BentoBox';
+
+export default function ComponentsPage() {
+  const [activeTab, setActiveTab] = useState('cards');
+
+  const tabs = [
+    { id: 'cards', name: 'Cards' },
+    { id: 'buttons', name: 'Buttons' },
+    { id: 'badges', name: 'Badges' },
+    { id: 'alerts', name: 'Alerts' },
+    { id: 'progress', name: 'Progress' },
+    { id: 'stats', name: 'Stats' },
+    { id: 'bento', name: 'Bento Grid' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <header className="bg-white shadow dark:bg-gray-800">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex items-center">
+            <Link
+              href="/dashboard"
+              className="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              <ArrowLeftIcon className="h-5 w-5" />
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Component Showcase
+            </h1>
+          </div>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            View and interact with all the UI components available in the ESCAPE Creator Engine.
+          </p>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* Tabs */}
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`${
+                  activeTab === tab.id
+                    ? 'border-primary-500 text-primary-600 dark:border-primary-400 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300'
+                } whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium`}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Content */}
+        <div className="mt-6">
+          {activeTab === 'cards' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Cards</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <Card title="Basic Card">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    This is a basic card with a title and content.
+                  </p>
+                </Card>
+                
+                <Card title="Card with Footer" footer={<div className="text-right"><Button size="sm">Action</Button></div>}>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    This card has a footer with an action button.
+                  </p>
+                </Card>
+                
+                <Card title="Card with Badge" badge={<Badge color="primary">New</Badge>}>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    This card has a badge in the title.
+                  </p>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'buttons' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Buttons</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Variants</h3>
+                <div className="flex flex-wrap gap-4">
+                  <Button variant="primary">Primary</Button>
+                  <Button variant="secondary">Secondary</Button>
+                  <Button variant="accent">Accent</Button>
+                  <Button variant="success">Success</Button>
+                  <Button variant="error">Error</Button>
+                  <Button variant="warning">Warning</Button>
+                  <Button variant="info">Info</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="ghost">Ghost</Button>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Sizes</h3>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Button variant="primary" size="xs">Extra Small</Button>
+                  <Button variant="primary" size="sm">Small</Button>
+                  <Button variant="primary" size="md">Medium</Button>
+                  <Button variant="primary" size="lg">Large</Button>
+                  <Button variant="primary" size="xl">Extra Large</Button>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button States</h3>
+                <div className="flex flex-wrap gap-4">
+                  <Button variant="primary">Normal</Button>
+                  <Button variant="primary" disabled>Disabled</Button>
+                  <Button variant="primary" loading>Loading</Button>
+                  <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />}>With Icon</Button>
+                  <Button variant="primary" iconRight={<HomeIcon className="h-5 w-5" />}>Icon Right</Button>
+                  <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />} iconOnly />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'badges' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Badges</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Colors</h3>
+                <div className="flex flex-wrap gap-4">
+                  <Badge color="primary">Primary</Badge>
+                  <Badge color="secondary">Secondary</Badge>
+                  <Badge color="accent">Accent</Badge>
+                  <Badge color="success">Success</Badge>
+                  <Badge color="error">Error</Badge>
+                  <Badge color="warning">Warning</Badge>
+                  <Badge color="info">Info</Badge>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Sizes</h3>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Badge color="primary" size="sm">Small</Badge>
+                  <Badge color="primary" size="md">Medium</Badge>
+                  <Badge color="primary" size="lg">Large</Badge>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Variants</h3>
+                <div className="flex flex-wrap gap-4">
+                  <Badge color="primary" variant="solid">Solid</Badge>
+                  <Badge color="primary" variant="outline">Outline</Badge>
+                  <Badge color="primary" variant="subtle">Subtle</Badge>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'alerts' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Alerts</h2>
+              
+              <div className="space-y-4">
+                <Alert 
+                  title="Success Alert" 
+                  type="success"
+                  icon={<CheckCircleIcon className="h-5 w-5" />}
+                >
+                  This is a success alert with an icon.
+                </Alert>
+                
+                <Alert 
+                  title="Error Alert" 
+                  type="error"
+                  icon={<XCircleIcon className="h-5 w-5" />}
+                >
+                  This is an error alert with an icon.
+                </Alert>
+                
+                <Alert 
+                  title="Warning Alert" 
+                  type="warning"
+                  icon={<ExclamationTriangleIcon className="h-5 w-5" />}
+                >
+                  This is a warning alert with an icon.
+                </Alert>
+                
+                <Alert 
+                  title="Info Alert" 
+                  type="info"
+                  icon={<InformationCircleIcon className="h-5 w-5" />}
+                >
+                  This is an info alert with an icon.
+                </Alert>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Alert with Actions</h3>
+                <Alert 
+                  title="Alert with Actions" 
+                  type="info"
+                  icon={<InformationCircleIcon className="h-5 w-5" />}
+                  actions={
+                    <div className="flex space-x-2">
+                      <Button variant="primary" size="sm">Accept</Button>
+                      <Button variant="outline" size="sm">Dismiss</Button>
+                    </div>
+                  }
+                >
+                  This alert has action buttons.
+                </Alert>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'progress' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Progress Components</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Progress Cards</h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <ProgressCard 
+                    title="Project Alpha" 
+                    progress={75} 
+                    status="In Progress"
+                    startDate="Jan 1, 2023"
+                    endDate="Dec 31, 2023"
+                  />
+                  
+                  <ProgressCard 
+                    title="Project Beta" 
+                    progress={100} 
+                    status="Completed"
+                    startDate="Mar 15, 2023"
+                    endDate="Sep 30, 2023"
+                  />
+                  
+                  <ProgressCard 
+                    title="Project Gamma" 
+                    progress={25} 
+                    status="At Risk"
+                    startDate="Jun 1, 2023"
+                    endDate="Feb 28, 2024"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'stats' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Stat Components</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Stat Cards</h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  <Stat 
+                    title="Total Users" 
+                    value="12,345"
+                    change={12}
+                    changeType="increase"
+                    icon={<HomeIcon className="h-6 w-6" />}
+                  />
+                  
+                  <Stat 
+                    title="Revenue" 
+                    value="$45,678"
+                    change={8.5}
+                    changeType="increase"
+                    icon={<HomeIcon className="h-6 w-6" />}
+                  />
+                  
+                  <Stat 
+                    title="Bounce Rate" 
+                    value="24.57%"
+                    change={3.2}
+                    changeType="decrease"
+                    icon={<HomeIcon className="h-6 w-6" />}
+                  />
+                  
+                  <Stat 
+                    title="Avg. Session" 
+                    value="2m 45s"
+                    change={0}
+                    changeType="neutral"
+                    icon={<HomeIcon className="h-6 w-6" />}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'bento' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Bento Grid</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Basic Bento Grid</h3>
+                <BentoGrid>
+                  <BentoBox size="1x1" className="bg-primary-50 dark:bg-primary-900/20">
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-primary-700 dark:text-primary-300">1x1</p>
+                    </div>
+                  </BentoBox>
+                  
+                  <BentoBox size="1x2" className="bg-secondary-50 dark:bg-secondary-900/20">
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-secondary-700 dark:text-secondary-300">1x2</p>
+                    </div>
+                  </BentoBox>
+                  
+                  <BentoBox size="2x1" className="bg-accent-50 dark:bg-accent-900/20">
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-accent-700 dark:text-accent-300">2x1</p>
+                    </div>
+                  </BentoBox>
+                  
+                  <BentoBox size="2x2" className="bg-success-50 dark:bg-success-900/20">
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-success-700 dark:text-success-300">2x2</p>
+                    </div>
+                  </BentoBox>
+                </BentoGrid>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Dashboard Example</h3>
+                <BentoGrid>
+                  <BentoBox size="2x1">
+                    <Stat 
+                      title="Total Users" 
+                      value="12,345"
+                      change={12}
+                      changeType="increase"
+                      icon={<HomeIcon className="h-6 w-6" />}
+                    />
+                  </BentoBox>
+                  
+                  <BentoBox size="1x1">
+                    <Card title="Quick Actions">
+                      <div className="flex flex-col space-y-2">
+                        <Button variant="outline" size="sm" fullWidth>New Project</Button>
+                        <Button variant="outline" size="sm" fullWidth>Add User</Button>
+                      </div>
+                    </Card>
+                  </BentoBox>
+                  
+                  <BentoBox size="1x2">
+                    <ProgressCard 
+                      title="Project Alpha" 
+                      progress={75} 
+                      status="In Progress"
+                      startDate="Jan 1, 2023"
+                      endDate="Dec 31, 2023"
+                    />
+                  </BentoBox>
+                  
+                  <BentoBox size="2x2">
+                    <Card title="Recent Activity">
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
+                            <HomeIcon className="h-4 w-4 text-primary-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">New user registered</p>
+                            <p className="text-xs text-gray-500">2 minutes ago</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center">
+                            <HomeIcon className="h-4 w-4 text-secondary-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Project updated</p>
+                            <p className="text-xs text-gray-500">1 hour ago</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="h-8 w-8 rounded-full bg-accent-100 flex items-center justify-center">
+                            <HomeIcon className="h-4 w-4 text-accent-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">New comment</p>
+                            <p className="text-xs text-gray-500">3 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </BentoBox>
+                </BentoGrid>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
