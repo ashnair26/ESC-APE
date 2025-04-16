@@ -1,0 +1,184 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useApi } from '@/components/api/useApi';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ServerIcon, CommandLineIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+
+interface Tool {
+  name: string;
+  description: string;
+  parameters: any;
+}
+
+export default function ServerDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const serverId = params.id as string;
+  const { client } = useApi();
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [serverName, setServerName] = useState('');
+  const [serverDescription, setServerDescription] = useState('');
+
+  useEffect(() => {
+    const fetchServerDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Fetch servers to get the name and description
+        const servers = await client.listServers();
+        if (!servers[serverId]) {
+          throw new Error(`Server ${serverId} not found`);
+        }
+
+        setServerName(serverId.charAt(0).toUpperCase() + serverId.slice(1));
+        setServerDescription(servers[serverId]);
+
+        // Fetch tools for this server
+        const toolsResponse = await client.listTools(serverId);
+        if (!toolsResponse.success) {
+          throw new Error(toolsResponse.error || 'Failed to load tools');
+        }
+
+        setTools(toolsResponse.tools || []);
+      } catch (err) {
+        console.error(`Error fetching server ${serverId} details:`, err);
+        setError(`Failed to load server details: ${err}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchServerDetails();
+  }, [client, serverId]);
+
+  return (
+    <div>
+      <div className="mb-8">
+        <div className="flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            ← Back
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {serverName} Server
+          </h1>
+        </div>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          {serverDescription}
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : error ? (
+        <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+          <div className="flex">
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800 dark:text-red-300">
+                Error
+              </h3>
+              <div className="mt-2 text-sm text-red-700 dark:text-red-400">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="mb-8">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              Server Information
+            </h2>
+            <div className="mt-4 overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
+              <div className="px-4 py-5 sm:p-6">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Server ID
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      {serverId}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Status
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-300">
+                        Online
+                      </span>
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Tools Count
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      {tools.length}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              Available Tools
+            </h2>
+            {tools.length === 0 ? (
+              <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                No tools available for this server.
+              </p>
+            ) : (
+              <div className="mt-4 overflow-hidden bg-white shadow sm:rounded-md dark:bg-gray-800">
+                <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {tools.map((tool) => (
+                    <li key={tool.name}>
+                      <Link
+                        href={`/dashboard/tools/${serverId}/${tool.name}`}
+                        className="block hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <div className="px-4 py-4 sm:px-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <CommandLineIcon
+                                className="mr-4 h-6 w-6 text-gray-400 dark:text-gray-500"
+                                aria-hidden="true"
+                              />
+                              <p className="truncate text-sm font-medium text-primary-600 dark:text-primary-400">
+                                {tool.name}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-2 sm:flex sm:justify-between">
+                            <div className="sm:flex">
+                              <p className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                {tool.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
