@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  HomeIcon, 
+import {
+  HomeIcon,
   ArrowLeftIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -20,6 +20,7 @@ import ProgressCard from '@/components/ui/ProgressCard';
 import Stat from '@/components/ui/Stat';
 import BentoGrid from '@/components/ui/BentoGrid';
 import BentoBox from '@/components/ui/BentoBox';
+import Navbar from '@/components/ui/Navbar';
 
 export default function ComponentsPage() {
   const [activeTab, setActiveTab] = useState('cards');
@@ -32,6 +33,7 @@ export default function ComponentsPage() {
     { id: 'progress', name: 'Progress' },
     { id: 'stats', name: 'Stats' },
     { id: 'bento', name: 'Bento Grid' },
+    { id: 'navbar', name: 'Navbar' },
   ];
 
   return (
@@ -86,13 +88,13 @@ export default function ComponentsPage() {
                     This is a basic card with a title and content.
                   </p>
                 </Card>
-                
+
                 <Card title="Card with Footer" footer={<div className="text-right"><Button size="sm">Action</Button></div>}>
                   <p className="text-gray-500 dark:text-gray-400">
                     This card has a footer with an action button.
                   </p>
                 </Card>
-                
+
                 <Card title="Card with Badge" badge={<Badge color="primary">New</Badge>}>
                   <p className="text-gray-500 dark:text-gray-400">
                     This card has a badge in the title.
@@ -105,7 +107,7 @@ export default function ComponentsPage() {
           {activeTab === 'buttons' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Buttons</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Variants</h3>
                 <div className="flex flex-wrap gap-4">
@@ -120,7 +122,7 @@ export default function ComponentsPage() {
                   <Button variant="ghost">Ghost</Button>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Sizes</h3>
                 <div className="flex flex-wrap items-center gap-4">
@@ -131,7 +133,7 @@ export default function ComponentsPage() {
                   <Button variant="primary" size="xl">Extra Large</Button>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Button States</h3>
                 <div className="flex flex-wrap gap-4">
@@ -149,7 +151,7 @@ export default function ComponentsPage() {
           {activeTab === 'badges' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Badges</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Colors</h3>
                 <div className="flex flex-wrap gap-4">
@@ -162,7 +164,7 @@ export default function ComponentsPage() {
                   <Badge color="info">Info</Badge>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Sizes</h3>
                 <div className="flex flex-wrap items-center gap-4">
@@ -171,7 +173,7 @@ export default function ComponentsPage() {
                   <Badge color="primary" size="lg">Large</Badge>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Badge Variants</h3>
                 <div className="flex flex-wrap gap-4">
@@ -186,45 +188,45 @@ export default function ComponentsPage() {
           {activeTab === 'alerts' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Alerts</h2>
-              
+
               <div className="space-y-4">
-                <Alert 
-                  title="Success Alert" 
+                <Alert
+                  title="Success Alert"
                   type="success"
                   icon={<CheckCircleIcon className="h-5 w-5" />}
                 >
                   This is a success alert with an icon.
                 </Alert>
-                
-                <Alert 
-                  title="Error Alert" 
+
+                <Alert
+                  title="Error Alert"
                   type="error"
                   icon={<XCircleIcon className="h-5 w-5" />}
                 >
                   This is an error alert with an icon.
                 </Alert>
-                
-                <Alert 
-                  title="Warning Alert" 
+
+                <Alert
+                  title="Warning Alert"
                   type="warning"
                   icon={<ExclamationTriangleIcon className="h-5 w-5" />}
                 >
                   This is a warning alert with an icon.
                 </Alert>
-                
-                <Alert 
-                  title="Info Alert" 
+
+                <Alert
+                  title="Info Alert"
                   type="info"
                   icon={<InformationCircleIcon className="h-5 w-5" />}
                 >
                   This is an info alert with an icon.
                 </Alert>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Alert with Actions</h3>
-                <Alert 
-                  title="Alert with Actions" 
+                <Alert
+                  title="Alert with Actions"
                   type="info"
                   icon={<InformationCircleIcon className="h-5 w-5" />}
                   actions={
@@ -243,29 +245,29 @@ export default function ComponentsPage() {
           {activeTab === 'progress' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Progress Components</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Progress Cards</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  <ProgressCard 
-                    title="Project Alpha" 
-                    progress={75} 
+                  <ProgressCard
+                    title="Project Alpha"
+                    progress={75}
                     status="In Progress"
                     startDate="Jan 1, 2023"
                     endDate="Dec 31, 2023"
                   />
-                  
-                  <ProgressCard 
-                    title="Project Beta" 
-                    progress={100} 
+
+                  <ProgressCard
+                    title="Project Beta"
+                    progress={100}
                     status="Completed"
                     startDate="Mar 15, 2023"
                     endDate="Sep 30, 2023"
                   />
-                  
-                  <ProgressCard 
-                    title="Project Gamma" 
-                    progress={25} 
+
+                  <ProgressCard
+                    title="Project Gamma"
+                    progress={25}
                     status="At Risk"
                     startDate="Jun 1, 2023"
                     endDate="Feb 28, 2024"
@@ -278,36 +280,36 @@ export default function ComponentsPage() {
           {activeTab === 'stats' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Stat Components</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Stat Cards</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  <Stat 
-                    title="Total Users" 
+                  <Stat
+                    title="Total Users"
                     value="12,345"
                     change={12}
                     changeType="increase"
                     icon={<HomeIcon className="h-6 w-6" />}
                   />
-                  
-                  <Stat 
-                    title="Revenue" 
+
+                  <Stat
+                    title="Revenue"
                     value="$45,678"
                     change={8.5}
                     changeType="increase"
                     icon={<HomeIcon className="h-6 w-6" />}
                   />
-                  
-                  <Stat 
-                    title="Bounce Rate" 
+
+                  <Stat
+                    title="Bounce Rate"
                     value="24.57%"
                     change={3.2}
                     changeType="decrease"
                     icon={<HomeIcon className="h-6 w-6" />}
                   />
-                  
-                  <Stat 
-                    title="Avg. Session" 
+
+                  <Stat
+                    title="Avg. Session"
                     value="2m 45s"
                     change={0}
                     changeType="neutral"
@@ -321,50 +323,50 @@ export default function ComponentsPage() {
           {activeTab === 'bento' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Bento Grid</h2>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Basic Bento Grid</h3>
                 <BentoGrid>
-                  <BentoBox size="1x1" className="bg-primary-50 dark:bg-primary-900/20">
+                  <BentoBox size="1x1" className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800" style={{ borderWidth: '0.5px' }}>
                     <div className="flex h-full items-center justify-center">
                       <p className="text-primary-700 dark:text-primary-300">1x1</p>
                     </div>
                   </BentoBox>
-                  
-                  <BentoBox size="1x2" className="bg-secondary-50 dark:bg-secondary-900/20">
+
+                  <BentoBox size="1x2" className="bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-100 dark:border-secondary-800" style={{ borderWidth: '0.5px' }}>
                     <div className="flex h-full items-center justify-center">
                       <p className="text-secondary-700 dark:text-secondary-300">1x2</p>
                     </div>
                   </BentoBox>
-                  
-                  <BentoBox size="2x1" className="bg-accent-50 dark:bg-accent-900/20">
+
+                  <BentoBox size="2x1" className="bg-accent-50 dark:bg-accent-900/20 border border-accent-100 dark:border-accent-800" style={{ borderWidth: '0.5px' }}>
                     <div className="flex h-full items-center justify-center">
                       <p className="text-accent-700 dark:text-accent-300">2x1</p>
                     </div>
                   </BentoBox>
-                  
-                  <BentoBox size="2x2" className="bg-success-50 dark:bg-success-900/20">
+
+                  <BentoBox size="2x2" className="bg-success-50 dark:bg-success-900/20 border border-success-100 dark:border-success-800" style={{ borderWidth: '0.5px' }}>
                     <div className="flex h-full items-center justify-center">
                       <p className="text-success-700 dark:text-success-300">2x2</p>
                     </div>
                   </BentoBox>
                 </BentoGrid>
               </div>
-              
+
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Dashboard Example</h3>
                 <BentoGrid>
-                  <BentoBox size="2x1">
-                    <Stat 
-                      title="Total Users" 
+                  <BentoBox size="2x1" noBorder>
+                    <Stat
+                      title="Total Users"
                       value="12,345"
                       change={12}
                       changeType="increase"
                       icon={<HomeIcon className="h-6 w-6" />}
                     />
                   </BentoBox>
-                  
-                  <BentoBox size="1x1">
+
+                  <BentoBox size="1x1" noBorder>
                     <Card title="Quick Actions">
                       <div className="flex flex-col space-y-2">
                         <Button variant="outline" size="sm" fullWidth>New Project</Button>
@@ -372,18 +374,18 @@ export default function ComponentsPage() {
                       </div>
                     </Card>
                   </BentoBox>
-                  
-                  <BentoBox size="1x2">
-                    <ProgressCard 
-                      title="Project Alpha" 
-                      progress={75} 
+
+                  <BentoBox size="1x2" noBorder>
+                    <ProgressCard
+                      title="Project Alpha"
+                      progress={75}
                       status="In Progress"
                       startDate="Jan 1, 2023"
                       endDate="Dec 31, 2023"
                     />
                   </BentoBox>
-                  
-                  <BentoBox size="2x2">
+
+                  <BentoBox size="2x2" noBorder>
                     <Card title="Recent Activity">
                       <div className="space-y-4">
                         <div className="flex items-center space-x-3">
@@ -417,6 +419,59 @@ export default function ComponentsPage() {
                     </Card>
                   </BentoBox>
                 </BentoGrid>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'navbar' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Navigation</h2>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Sliding Navbar</h3>
+                <div className="w-full max-w-3xl">
+                  <Navbar
+                    items={['PROJECT', 'SOCIAL', 'ANALYTICS', 'CONTENT', 'MINT']}
+                    initialActive={0}
+                    onChange={(index) => console.log(`Switched to tab ${index}`)}
+                  />
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  This navbar features a smooth sliding indicator that moves to highlight the active item.
+                  Click on different items to see the animation in action.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Navbar Variants</h3>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary</p>
+                    <Navbar
+                      items={['Home', 'Features', 'Pricing', 'About', 'Contact']}
+                      initialActive={0}
+                      className="border-primary-200 dark:border-primary-800"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Secondary</p>
+                    <Navbar
+                      items={['Dashboard', 'Analytics', 'Reports', 'Settings', 'Support']}
+                      initialActive={1}
+                      className="border-secondary-200 dark:border-secondary-800"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Accent</p>
+                    <Navbar
+                      items={['Overview', 'Activity', 'Explore', 'Favorites', 'Archive']}
+                      initialActive={2}
+                      className="border-accent-200 dark:border-accent-800"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
