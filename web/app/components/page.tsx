@@ -21,6 +21,8 @@ import Stat from '@/components/ui/Stat';
 import BentoGrid from '@/components/ui/BentoGrid';
 import BentoBox from '@/components/ui/BentoBox';
 import Navbar from '@/components/ui/Navbar';
+import ComicEntryCard from '@/components/ui/ComicEntryCard';
+import BrutalistButton from '@/components/ui/BrutalistButton';
 
 export default function ComponentsPage() {
   const [activeTab, setActiveTab] = useState('cards');
@@ -34,6 +36,7 @@ export default function ComponentsPage() {
     { id: 'stats', name: 'Stats' },
     { id: 'bento', name: 'Bento Grid' },
     { id: 'navbar', name: 'Navbar' },
+    { id: 'comic', name: 'Comic Components' },
   ];
 
   return (
@@ -143,6 +146,52 @@ export default function ComponentsPage() {
                   <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />}>With Icon</Button>
                   <Button variant="primary" iconRight={<HomeIcon className="h-5 w-5" />}>Icon Right</Button>
                   <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />} iconOnly />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Brutalist Buttons</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Brutalist design emphasizes raw, unpolished aesthetics with bold colors, sharp contrasts, and unconventional layouts.
+                </p>
+
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Colors</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <BrutalistButton color="red">Red</BrutalistButton>
+                      <BrutalistButton color="blue">Blue</BrutalistButton>
+                      <BrutalistButton color="yellow">Yellow</BrutalistButton>
+                      <BrutalistButton color="green">Green</BrutalistButton>
+                      <BrutalistButton color="black">Black</BrutalistButton>
+                      <BrutalistButton color="white">White</BrutalistButton>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sizes</h4>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <BrutalistButton color="red" size="sm">Small</BrutalistButton>
+                      <BrutalistButton color="red" size="md">Medium</BrutalistButton>
+                      <BrutalistButton color="red" size="lg">Large</BrutalistButton>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Styles</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <BrutalistButton color="blue" skew>Skewed</BrutalistButton>
+                      <BrutalistButton color="yellow" noisy>Noisy</BrutalistButton>
+                      <BrutalistButton color="green" skew noisy>Skewed & Noisy</BrutalistButton>
+                      <BrutalistButton color="black" disabled>Disabled</BrutalistButton>
+                      <BrutalistButton color="red" loading>Loading</BrutalistButton>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comic Read Button</h4>
+                    <BrutalistButton color="red" style={{ backgroundColor: '#c20023', borderColor: '#000000' }}>READ NOW</BrutalistButton>
+                  </div>
                 </div>
               </div>
             </div>
@@ -501,6 +550,54 @@ export default function ComponentsPage() {
                         breakpoint={300} // Only switch to mobile at very small widths
                       />
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'comic' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Comic Components</h2>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Comic Entry Card</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  This card serves as the entry point to the Comic Reader. It displays the chapter cover image, title, and a call-to-action button.
+                  The card has fixed dimensions (358px × 514px) with the image filling the entire card and text overlay at the bottom.
+                </p>
+
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Standard Chapter</p>
+                    <ComicEntryCard
+                      chapterNumber={1}
+                      chapterTitle="The Awakening"
+                      description="The journey begins as our hero discovers a hidden world beneath the surface."
+                      coverImage="/images/comic-cover-1.jpg"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Chapter</p>
+                    <ComicEntryCard
+                      chapterNumber={2}
+                      chapterTitle="The Descent"
+                      description="Venturing deeper into the unknown, secrets begin to reveal themselves."
+                      coverImage="/images/comic-cover-2.jpg"
+                      isNew={true}
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Locked Chapter</p>
+                    <ComicEntryCard
+                      chapterNumber={3}
+                      chapterTitle="The Revelation"
+                      description="The truth is finally revealed, but at what cost?"
+                      coverImage="/images/comic-cover-3.jpg"
+                      isLocked={true}
+                    />
                   </div>
                 </div>
               </div>
