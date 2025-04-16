@@ -29,7 +29,7 @@ const BentoBox: React.FC<BentoBoxProps> = ({
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-lg',
+        'overflow-hidden rounded-custom',
         sizeClasses[size],
         onClick && 'cursor-pointer transition-all hover:shadow-md',
         className

@@ -48,6 +48,9 @@ module.exports = {
           950: '#431407',
         },
       },
+      borderRadius: {
+        'custom': '0.575rem', // 9.2px (15% increase from 8px)
+      },
     },
   },
   plugins: [

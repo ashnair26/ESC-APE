@@ -68,7 +68,7 @@ const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full font-medium',
+        'inline-flex items-center rounded-full font-medium', // Keep badges fully rounded
         colorClasses[variant][color],
         sizeClasses[size],
         className

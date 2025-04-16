@@ -39,7 +39,7 @@ const Alert: React.FC<AlertProps> = ({
   return (
     <div
       className={clsx(
-        'rounded-md p-4',
+        'rounded-custom p-4',
         typeClasses[type],
         className
       )}

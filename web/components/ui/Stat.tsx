@@ -21,12 +21,12 @@ const Stat: React.FC<StatProps> = ({
 }) => {
   const renderChange = () => {
     if (change === undefined || change === null) return null;
-    
+
     const changeValue = Math.abs(change);
     const formattedChange = Number.isInteger(changeValue)
       ? changeValue.toString()
       : changeValue.toFixed(1);
-    
+
     return (
       <div
         className={clsx(
@@ -52,7 +52,7 @@ const Stat: React.FC<StatProps> = ({
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800',
+        'overflow-hidden rounded-custom bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800',
         className
       )}
     >

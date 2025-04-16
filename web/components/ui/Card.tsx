@@ -21,7 +21,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800',
+        'overflow-hidden rounded-custom bg-white shadow dark:bg-gray-800',
         onClick && 'cursor-pointer transition-all hover:shadow-md',
         className
       )}
