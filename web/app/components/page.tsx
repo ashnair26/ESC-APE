@@ -438,7 +438,8 @@ export default function ComponentsPage() {
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   This navbar features a smooth sliding indicator that moves to highlight the active item.
-                  Click on different items to see the animation in action.
+                  Click on different items to see the animation in action. Resize your browser window to see
+                  it transform into a hamburger menu when space is limited.
                 </p>
               </div>
 
@@ -470,6 +471,36 @@ export default function ComponentsPage() {
                       initialActive={2}
                       className="border-accent-200 dark:border-accent-800"
                     />
+                  </div>
+                </div>
+
+                <h3 className="text-md font-medium text-gray-900 dark:text-white mt-8">Responsive Behavior</h3>
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    The navbar automatically transforms into a hamburger menu when the container width becomes too small.
+                    You can control this breakpoint with the <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">breakpoint</code> prop.
+                  </p>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Small Container (Always Mobile)</p>
+                      <div className="w-48">
+                        <Navbar
+                          items={['One', 'Two', 'Three', 'Four', 'Five']}
+                          initialActive={0}
+                          breakpoint={1000} // Force mobile view in this small container
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Custom Breakpoint (300px)</p>
+                      <Navbar
+                        items={['Short', 'Items', 'Fit', 'Better']}
+                        initialActive={0}
+                        breakpoint={300} // Only switch to mobile at very small widths
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
