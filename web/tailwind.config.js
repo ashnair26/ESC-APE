@@ -47,6 +47,9 @@ module.exports = {
           900: '#7c2d12',
           950: '#431407',
         },
+        dark: {
+          card: '#181818',
+        },
       },
       borderRadius: {
         'custom': '0.575rem', // 9.2px (15% increase from 8px)

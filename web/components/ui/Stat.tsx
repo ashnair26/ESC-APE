@@ -52,9 +52,10 @@ const Stat: React.FC<StatProps> = ({
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-custom bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800',
+        'overflow-hidden rounded-custom bg-white px-4 py-5 shadow sm:p-6 dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
         className
       )}
+      style={{ borderWidth: '0.5px' }}
     >
       <div className="flex items-center">
         {icon && (

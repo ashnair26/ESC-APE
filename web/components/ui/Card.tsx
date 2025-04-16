@@ -21,10 +21,11 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-custom bg-white shadow dark:bg-gray-800',
+        'overflow-hidden rounded-custom bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
         onClick && 'cursor-pointer transition-all hover:shadow-md',
         className
       )}
+      style={{ borderWidth: '0.5px' }}
       onClick={onClick}
     >
       {title && (

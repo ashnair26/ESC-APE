@@ -8,6 +8,7 @@ interface BentoBoxProps {
   size?: BentoBoxSize;
   className?: string;
   onClick?: () => void;
+  noBorder?: boolean;
 }
 
 const BentoBox: React.FC<BentoBoxProps> = ({
@@ -15,6 +16,7 @@ const BentoBox: React.FC<BentoBoxProps> = ({
   size = '1x1',
   className,
   onClick,
+  noBorder = false,
 }) => {
   const sizeClasses = {
     '1x1': 'col-span-4 md:col-span-4 lg:col-span-3 row-span-1',
@@ -26,14 +28,21 @@ const BentoBox: React.FC<BentoBoxProps> = ({
     '3x3': 'col-span-4 md:col-span-8 lg:col-span-9 row-span-3',
   };
 
+  // Check if the child is a component that already has a border
+  // For the dashboard example, we don't want to add a border to the BentoBox
+  // when it contains a Stat or ProgressCard component
+  const shouldHaveBorder = !noBorder;
+
   return (
     <div
       className={clsx(
         'overflow-hidden rounded-custom',
+        shouldHaveBorder && 'border border-gray-200 dark:border-gray-700 dark:bg-[#181818]',
         sizeClasses[size],
         onClick && 'cursor-pointer transition-all hover:shadow-md',
         className
       )}
+      style={shouldHaveBorder ? { borderWidth: '0.5px' } : undefined}
       onClick={onClick}
     >
       {children}

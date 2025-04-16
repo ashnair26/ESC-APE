@@ -49,7 +49,7 @@ const Button: React.FC<ButtonProps> = ({
     warning: 'bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500',
     info: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
     outline:
-      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 dark:bg-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800',
+      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 dark:bg-[#181818] dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800',
     ghost:
       'bg-transparent text-gray-700 hover:bg-gray-50 focus:ring-primary-500 dark:text-gray-300 dark:hover:bg-gray-800',
   };
@@ -73,7 +73,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center rounded-custom font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors',
+        'inline-flex items-center justify-center rounded-custom font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#181818] transition-colors',
         variantClasses[variant],
         iconOnly ? iconSizeClasses[size] : sizeClasses[size],
         fullWidth && 'w-full',

@@ -93,7 +93,7 @@ const Navbar: React.FC<NavbarProps> = ({
       {isMobile && (
         <div
           className={clsx(
-            'relative rounded-full bg-white shadow dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+            'relative rounded-full bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
             className
           )}
           style={{ borderWidth: '0.5px' }}
@@ -119,7 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
           {/* Mobile dropdown menu */}
           {isMenuOpen && (
-            <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-lg bg-white shadow-lg dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-lg bg-white shadow-lg dark:bg-[#181818] border border-gray-200 dark:border-gray-700">
               <div className="py-1">
                 {items.map((item, index) => (
                   <button
@@ -146,7 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({
         <div
           ref={navRef}
           className={clsx(
-            'relative flex items-center justify-between rounded-full bg-white p-1.5 shadow dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+            'relative flex items-center justify-between rounded-full bg-white p-1.5 shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
             className
           )}
           style={{ borderWidth: '0.5px' }}

@@ -23,10 +23,10 @@ const Alert: React.FC<AlertProps> = ({
   onClose,
 }) => {
   const typeClasses = {
-    success: 'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-    error: 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300',
-    warning: 'bg-yellow-50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-    info: 'bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+    success: 'bg-green-50 text-green-800 dark:bg-[#181818] dark:border dark:border-green-800 dark:text-green-300',
+    error: 'bg-red-50 text-red-800 dark:bg-[#181818] dark:border dark:border-red-800 dark:text-red-300',
+    warning: 'bg-yellow-50 text-yellow-800 dark:bg-[#181818] dark:border dark:border-yellow-800 dark:text-yellow-300',
+    info: 'bg-blue-50 text-blue-800 dark:bg-[#181818] dark:border dark:border-blue-800 dark:text-blue-300',
   };
 
   const iconClasses = {
@@ -70,10 +70,10 @@ const Alert: React.FC<AlertProps> = ({
                 className={clsx(
                   'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
                   {
-                    'bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600 focus:ring-offset-green-50 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40': type === 'success',
-                    'bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600 focus:ring-offset-red-50 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40': type === 'error',
-                    'bg-yellow-50 text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600 focus:ring-offset-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40': type === 'warning',
-                    'bg-blue-50 text-blue-500 hover:bg-blue-100 focus:ring-blue-600 focus:ring-offset-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40': type === 'info',
+                    'bg-green-50 text-green-500 hover:bg-green-100 focus:ring-green-600 focus:ring-offset-green-50 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 dark:focus:ring-offset-[#181818]': type === 'success',
+                    'bg-red-50 text-red-500 hover:bg-red-100 focus:ring-red-600 focus:ring-offset-red-50 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 dark:focus:ring-offset-[#181818]': type === 'error',
+                    'bg-yellow-50 text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600 focus:ring-offset-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 dark:focus:ring-offset-[#181818]': type === 'warning',
+                    'bg-blue-50 text-blue-500 hover:bg-blue-100 focus:ring-blue-600 focus:ring-offset-blue-50 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 dark:focus:ring-offset-[#181818]': type === 'info',
                   }
                 )}
               >
