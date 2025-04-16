@@ -12,6 +12,7 @@ import {
   KeyIcon,
   CogIcon,
   UserCircleIcon,
+  SwatchIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { useAuth } from '@/components/auth/useAuth';
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Tools', href: '/dashboard/tools', icon: CommandLineIcon },
   { name: 'Secrets', href: '/dashboard/secrets', icon: KeyIcon },
   { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
+  { name: 'UI Components', href: '/components', icon: SwatchIcon },
 ];
 
 export default function DashboardLayout({
