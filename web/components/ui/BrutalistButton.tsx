@@ -4,12 +4,12 @@ import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 import LoadingSpinner from './LoadingSpinner';
 
-type BrutalistButtonColor = 
-  | 'red' 
-  | 'blue' 
-  | 'yellow' 
-  | 'green' 
-  | 'black' 
+type BrutalistButtonColor =
+  | 'red'
+  | 'blue'
+  | 'yellow'
+  | 'green'
+  | 'black'
   | 'white';
 
 type BrutalistButtonSize = 'sm' | 'md' | 'lg';
@@ -53,9 +53,9 @@ const BrutalistButton: React.FC<BrutalistButtonProps> = ({
 
   // Brutalist sizes with chunky proportions
   const sizeClasses = {
-    sm: 'px-3 py-1 text-sm',
-    md: 'px-5 py-2 text-base',
-    lg: 'px-7 py-3 text-lg',
+    sm: 'px-3 py-1 text-[10px] tracking-wider',
+    md: 'px-5 py-2 text-xs tracking-wider', // Changed from text-sm to text-xs (12px)
+    lg: 'px-7 py-3 text-sm tracking-wider',  // Changed from text-base to text-sm
   };
 
   // Noise texture for brutalist aesthetic
@@ -68,9 +68,9 @@ const BrutalistButton: React.FC<BrutalistButtonProps> = ({
   return (
     <button
       className={clsx(
-        'relative inline-flex items-center justify-center font-bold uppercase tracking-wider',
-        'border-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
-        'active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]',
+        'relative inline-flex items-center justify-center font-lemonmilk font-bold uppercase tracking-wider',
+        'border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // Changed from border-4 to border-2 and shadow from 4px to 2px
+        'active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]', // Adjusted active state
         'transition-shadow duration-100 ease-in-out',
         colorClasses[color],
         sizeClasses[size],

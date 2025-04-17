@@ -6,6 +6,11 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontFamily: {
+      sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+      lemonmilk: ['Lemonmilk', 'ui-sans-serif', 'system-ui'],
+    },
     extend: {
       colors: {
         primary: {
@@ -53,6 +58,16 @@ module.exports = {
       },
       borderRadius: {
         'custom': '0.575rem', // 9.2px (15% increase from 8px)
+      },
+      keyframes: {
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' },
+        },
+      },
+      animation: {
+        shake: 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
       },
     },
   },

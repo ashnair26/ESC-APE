@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import Button from './Button';
+import BrutalistButton from './BrutalistButton';
 
 interface ComicEntryCardProps {
   chapterNumber: number;
@@ -107,15 +107,15 @@ const ComicEntryCard: React.FC<ComicEntryCardProps> = ({
           )}
         </div>
 
-        <Button
-          variant={isLocked ? "outline" : "primary"}
-          className="w-full"
+        <BrutalistButton
+          color="red"
+          className="w-full font-lemonmilk"
           onClick={handleClick}
           disabled={isLocked}
-          style={!isLocked ? { backgroundColor: '#c20023', borderColor: '#c20023' } : undefined}
+          style={!isLocked ? { backgroundColor: '#c20023', borderColor: '#000000' } : undefined}
         >
-          {isLocked ? 'Locked' : buttonText}
-        </Button>
+          {isLocked ? 'LOCKED' : buttonText.toUpperCase()}
+        </BrutalistButton>
       </div>
     </div>
   );
