@@ -68,7 +68,7 @@ const BrutalistButton: React.FC<BrutalistButtonProps> = ({
   return (
     <button
       className={clsx(
-        'relative inline-flex items-center justify-center font-lemonmilk font-bold uppercase tracking-wider',
+        'relative inline-flex items-center justify-center font-escape-heading font-bold uppercase tracking-wider',
         'border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // Changed from border-4 to border-2 and shadow from 4px to 2px
         'active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]', // Adjusted active state
         'transition-shadow duration-100 ease-in-out',

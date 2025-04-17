@@ -1,7 +1,10 @@
 import './globals.css';
+import './fonts.css';
+import './themes.css';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { ApiProvider } from '@/components/api/ApiProvider';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +23,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ApiProvider>
-            {children}
+            <ThemeProvider defaultTheme="escape">
+              {children}
+            </ThemeProvider>
           </ApiProvider>
         </AuthProvider>
       </body>

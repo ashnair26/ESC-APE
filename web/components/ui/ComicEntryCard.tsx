@@ -100,16 +100,16 @@ const ComicEntryCard: React.FC<ComicEntryCardProps> = ({
       {/* Content overlay at bottom */}
       <div className="absolute bottom-0 left-0 right-0 z-10 p-6 text-white">
         <div className="space-y-2 mb-4">
-          <div className="text-sm font-medium text-primary-400">Chapter {chapterNumber}</div>
-          <h3 className="text-xl font-bold tracking-tight">{chapterTitle}</h3>
+          <div className="text-sm font-medium text-primary-400 font-escape-heading">Chapter {chapterNumber}</div>
+          <h3 className="text-xl font-bold tracking-tight font-escape-heading">{chapterTitle}</h3>
           {description && (
-            <p className="text-sm text-gray-300 line-clamp-2">{description}</p>
+            <p className="text-sm text-gray-300 line-clamp-2 font-escape-body">{description}</p>
           )}
         </div>
 
         <BrutalistButton
           color="red"
-          className="w-full font-lemonmilk"
+          className="w-full"
           onClick={handleClick}
           disabled={isLocked}
           style={!isLocked ? { backgroundColor: '#c20023', borderColor: '#000000' } : undefined}

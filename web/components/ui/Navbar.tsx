@@ -125,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   <button
                     key={item}
                     className={clsx(
-                      'block w-full px-4 py-2 text-left text-sm',
+                      'block w-full px-4 py-2 text-left text-sm font-escape-heading',
                       activeIndex === index
                         ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300'
                         : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700/50'
@@ -169,7 +169,7 @@ const Navbar: React.FC<NavbarProps> = ({
               key={item}
               ref={(el) => (itemRefs.current[index] = el)}
               className={clsx(
-                'relative z-10 rounded-full px-5 py-2.5 text-sm font-medium transition-colors whitespace-nowrap mx-0.5',
+                'relative z-10 rounded-full px-5 py-2.5 text-sm font-medium transition-colors whitespace-nowrap mx-0.5 font-escape-heading',
                 activeIndex === index
                   ? 'text-white dark:text-white'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'

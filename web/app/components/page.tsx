@@ -8,7 +8,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ExclamationTriangleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
 // Component imports will go here as we create them
@@ -23,6 +24,7 @@ import BentoBox from '@/components/ui/BentoBox';
 import Navbar from '@/components/ui/Navbar';
 import ComicEntryCard from '@/components/ui/ComicEntryCard';
 import BrutalistButton from '@/components/ui/BrutalistButton';
+import StageCard from '@/components/ui/StageCard';
 
 export default function ComponentsPage() {
   const [activeTab, setActiveTab] = useState('cards');
@@ -43,18 +45,27 @@ export default function ComponentsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <header className="bg-white shadow dark:bg-gray-800">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Link
+                href="/dashboard"
+                className="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
+                <ArrowLeftIcon className="h-5 w-5" />
+              </Link>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-escape-heading">
+                Component Showcase
+              </h1>
+            </div>
             <Link
-              href="/dashboard"
-              className="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              href="/settings"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 font-escape-heading"
             >
-              <ArrowLeftIcon className="h-5 w-5" />
+              <Cog6ToothIcon className="h-5 w-5 mr-1" />
+              Theme Settings
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Component Showcase
-            </h1>
           </div>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-escape-body">
             View and interact with all the UI components available in the ESCAPE Creator Engine.
           </p>
         </div>
@@ -85,24 +96,62 @@ export default function ComponentsPage() {
           {activeTab === 'cards' && (
             <div className="space-y-8">
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Cards</h2>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <Card title="Basic Card">
-                  <p className="text-gray-500 dark:text-gray-400">
-                    This is a basic card with a title and content.
-                  </p>
-                </Card>
 
-                <Card title="Card with Footer" footer={<div className="text-right"><Button size="sm">Action</Button></div>}>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    This card has a footer with an action button.
-                  </p>
-                </Card>
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Basic Cards</h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <Card title="Basic Card">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      This is a basic card with a title and content.
+                    </p>
+                  </Card>
 
-                <Card title="Card with Badge" badge={<Badge color="primary">New</Badge>}>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    This card has a badge in the title.
-                  </p>
-                </Card>
+                  <Card title="Card with Footer" footer={<div className="text-right"><Button size="sm">Action</Button></div>}>
+                    <p className="text-gray-500 dark:text-gray-400">
+                      This card has a footer with an action button.
+                    </p>
+                  </Card>
+
+                  <Card title="Card with Badge" badge={<Badge color="primary">New</Badge>}>
+                    <p className="text-gray-500 dark:text-gray-400">
+                      This card has a badge in the title.
+                    </p>
+                  </Card>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Stage Card</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  The Stage Card is a large, immersive card that represents a stage in the creator's world.
+                  It features a full-bleed background image, lore text, and a password input for unlocking.
+                  The card has fixed dimensions (1174px × 574px) in desktop view.
+                </p>
+
+                <div className="space-y-8">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Locked Stage</p>
+                    <StageCard
+                      stageNumber={1}
+                      stageTitle="The Forgotten Realm"
+                      loreText="Deep within the ancient forest lies a realm forgotten by time itself. Whispers of its existence have been passed down through generations, but few have ever glimpsed its true nature. Those who venture too close often find themselves lost in endless circles, their memories fading with each step."
+                      backgroundImage="/images/stage-bg-1.jpg"
+                      isLocked={true}
+                      correctPassword="ESCAPE"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unlocked Stage</p>
+                    <StageCard
+                      stageNumber={2}
+                      stageTitle="The Crystal Caverns"
+                      loreText="Beneath the surface world, a network of crystal caverns pulses with ancient energy. The walls shimmer with colors unknown to the human eye, and the air itself seems to whisper secrets to those who know how to listen. Many have sought the source of this power, but the caverns reveal their mysteries only to the worthy."
+                      backgroundImage="/images/stage-bg-2.jpg"
+                      isLocked={false}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
