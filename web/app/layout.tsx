@@ -6,7 +6,11 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { ApiProvider } from '@/components/api/ApiProvider';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export const metadata = {
   title: 'ESCAPE Admin Dashboard',
@@ -20,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${inter.className}`}>
         <AuthProvider>
           <ApiProvider>
             <ThemeProvider defaultTheme="escape">

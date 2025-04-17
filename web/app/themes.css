@@ -5,28 +5,28 @@
   /* Typography */
   --font-heading: 'Lemonmilk', ui-sans-serif, system-ui;
   --font-body: 'ManlyMenBB', ui-sans-serif, system-ui;
-  
+
   /* Colors */
   --color-primary: #c20023;
   --color-secondary: #181818;
   --color-accent: #FFD700;
-  
+
   /* Apply fonts to elements */
-  & h1, & h2, & h3, & h4, & h5, & h6, 
+  & h1, & h2, & h3, & h4, & h5, & h6,
   & .nav-link, & button:not(.non-themed) {
     font-family: var(--font-heading);
   }
-  
+
   & body, & p, & li, & input, & textarea {
     font-family: var(--font-body);
   }
-  
+
   /* Apply colors to elements */
   & .btn-primary {
     background-color: var(--color-primary);
     border-color: #000000;
   }
-  
+
   & .nav-link.active {
     background-color: var(--color-primary);
   }
@@ -35,13 +35,23 @@
 /* Default Theme */
 .theme-default {
   /* Typography */
-  --font-heading: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  
+  --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
   /* Colors */
   --color-primary: #0ea5e9;
   --color-secondary: #6b7280;
   --color-accent: #8b5cf6;
+
+  /* Apply fonts to elements */
+  & h1, & h2, & h3, & h4, & h5, & h6,
+  & .nav-link, & button:not(.non-themed) {
+    font-family: var(--font-heading);
+  }
+
+  & body, & p, & li, & input, & textarea {
+    font-family: var(--font-body);
+  }
 }
 
 /* Cyberpunk Theme */
@@ -49,7 +59,7 @@
   /* Typography */
   --font-heading: ui-sans-serif, system-ui;
   --font-body: ui-sans-serif, system-ui;
-  
+
   /* Colors */
   --color-primary: #00ffff;
   --color-secondary: #ff00ff;
@@ -61,7 +71,7 @@
   /* Typography */
   --font-heading: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-body: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  
+
   /* Colors */
   --color-primary: #8b5cf6;
   --color-secondary: #1e293b;
@@ -73,7 +83,7 @@
   /* Typography */
   --font-heading: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   --font-body: ui-sans-serif, system-ui;
-  
+
   /* Colors */
   --color-primary: #10b981;
   --color-secondary: #111827;
