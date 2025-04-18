@@ -425,25 +425,25 @@ export default function ComponentsPage() {
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Basic Bento Grid</h3>
                 <BentoGrid>
-                  <BentoBox size="1x1" className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800" style={{ borderWidth: '0.5px' }}>
+                  <BentoBox size="1x1" className="bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800 border-[0.5px]">
                     <div className="flex h-full items-center justify-center">
                       <p className="text-primary-700 dark:text-primary-300">1x1</p>
                     </div>
                   </BentoBox>
 
-                  <BentoBox size="1x2" className="bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-100 dark:border-secondary-800" style={{ borderWidth: '0.5px' }}>
+                  <BentoBox size="1x2" className="bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-100 dark:border-secondary-800 border-[0.5px]">
                     <div className="flex h-full items-center justify-center">
                       <p className="text-secondary-700 dark:text-secondary-300">1x2</p>
                     </div>
                   </BentoBox>
 
-                  <BentoBox size="2x1" className="bg-accent-50 dark:bg-accent-900/20 border border-accent-100 dark:border-accent-800" style={{ borderWidth: '0.5px' }}>
+                  <BentoBox size="2x1" className="bg-accent-50 dark:bg-accent-900/20 border border-accent-100 dark:border-accent-800 border-[0.5px]">
                     <div className="flex h-full items-center justify-center">
                       <p className="text-accent-700 dark:text-accent-300">2x1</p>
                     </div>
                   </BentoBox>
 
-                  <BentoBox size="2x2" className="bg-success-50 dark:bg-success-900/20 border border-success-100 dark:border-success-800" style={{ borderWidth: '0.5px' }}>
+                  <BentoBox size="2x2" className="bg-success-50 dark:bg-success-900/20 border border-success-100 dark:border-success-800 border-[0.5px]">
                     <div className="flex h-full items-center justify-center">
                       <p className="text-success-700 dark:text-success-300">2x2</p>
                     </div>

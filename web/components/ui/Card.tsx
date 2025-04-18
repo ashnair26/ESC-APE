@@ -6,6 +6,7 @@ interface CardProps {
   children: ReactNode;
   footer?: ReactNode;
   badge?: ReactNode;
+  icon?: ReactNode;
   className?: string;
   onClick?: () => void;
 }
@@ -15,25 +16,28 @@ const Card: React.FC<CardProps> = ({
   children,
   footer,
   badge,
+  icon,
   className,
   onClick,
 }) => {
   return (
     <div
       className={clsx(
-        'overflow-hidden rounded-custom bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
+        'overflow-hidden rounded-custom bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700 border-[0.5px]',
         onClick && 'cursor-pointer transition-all hover:shadow-md',
         className
       )}
-      style={{ borderWidth: '0.5px' }}
       onClick={onClick}
     >
       {title && (
         <div className="border-b border-gray-200 px-4 py-5 sm:px-6 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-              {title}
-            </h3>
+            <div className="flex items-center">
+              {icon && <div className="mr-2 text-gray-500 dark:text-gray-400">{icon}</div>}
+              <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                {title}
+              </h3>
+            </div>
             {badge && <div>{badge}</div>}
           </div>
         </div>

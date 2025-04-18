@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
 
         // Convert array of objects to a single object
         const apiKeys: Record<string, string> = {};
-        data.forEach(item => {
+        data.forEach((item: { key: string; value: string }) => {
           apiKeys[item.key] = item.value;
         });
 

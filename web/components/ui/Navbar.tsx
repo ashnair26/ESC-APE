@@ -49,11 +49,12 @@ const Navbar: React.FC<NavbarProps> = ({
       const containerWidth = containerRef.current.offsetWidth;
       const shouldBeMobile = containerWidth < breakpoint;
 
-      if (shouldBeMobile !== isMobile) {
-        setIsMobile(shouldBeMobile);
-        if (shouldBeMobile) {
-          setIsMenuOpen(false);
-        }
+      // Always update the mobile state regardless of previous state
+      setIsMobile(shouldBeMobile);
+
+      // If transitioning from mobile to desktop, ensure menu is closed
+      if (!shouldBeMobile && isMobile) {
+        setIsMenuOpen(false);
       }
     }
   };
@@ -93,10 +94,9 @@ const Navbar: React.FC<NavbarProps> = ({
       {isMobile && (
         <div
           className={clsx(
-            'relative rounded-full bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
+            'relative rounded-full bg-white shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700 border-[0.5px]',
             className
           )}
-          style={{ borderWidth: '0.5px' }}
         >
           <div className="flex items-center justify-between p-1.5">
             {/* Show active item text */}
@@ -146,10 +146,9 @@ const Navbar: React.FC<NavbarProps> = ({
         <div
           ref={navRef}
           className={clsx(
-            'relative flex items-center justify-between rounded-full bg-white p-1.5 shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700',
+            'relative flex items-center justify-between rounded-full bg-white p-1.5 shadow dark:bg-[#181818] border border-gray-200 dark:border-gray-700 border-[0.5px]',
             className
           )}
-          style={{ borderWidth: '0.5px' }}
         >
           {/* Sliding indicator */}
           <div
