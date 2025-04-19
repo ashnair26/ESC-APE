@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image'; // Import the Image component
 import { useAuth } from '@/contexts/AuthContext'; // Assuming this path is correct
 
 export default function AdminLoginPage() {
@@ -68,8 +69,27 @@ export default function AdminLoginPage() {
 
   // Render the login form
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-[#333333]"> {/* Changed dark mode background */}
+      {/* Updated card styles: background, border, rounding */}
+      <div className="w-full max-w-md p-8 space-y-6 bg-[#010101] rounded-xl shadow-md border-[0.5px] border-gray-300 dark:border-gray-600">
+        {/* Added Logos */}
+        <div className="flex flex-col items-center space-y-2">
+           <Image
+             src="/images/escape2.svg" // Corrected filename
+             alt="Escape Logo Top"    // Corrected alt text
+             width={180}
+             height={40}
+             priority // Prioritize loading the logo
+           />
+           <Image
+             src="/images/escape1.svg" // Corrected filename
+             alt="Escape Logo Bottom" // Corrected alt text
+             width={180} // Increased width by 20%
+             height={36} // Increased height by 20%
+           />
+        </div>
+        {/* End Added Logos */}
+
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Admin Login</h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -125,7 +145,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isSubmitting || authLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#c20023] hover:bg-[#a5001e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#c20023] disabled:opacity-50 disabled:cursor-not-allowed" // Updated background, hover, and focus ring colors
             >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>

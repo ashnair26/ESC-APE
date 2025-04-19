@@ -166,6 +166,7 @@ This document tracks implementation tasks, progress, and priorities for the ESCA
 - Unified API for all MCP servers (April 16, 2024)
 - Web interface for managing MCP servers (April 16, 2024)
 - Basic dashboard UI components (April 16, 2024)
+- Admin Dashboard Login Flow (April 19, 2024) - Fixed middleware Edge Runtime incompatibility with jose library.
 
 ## 🔎 Discovered During Work
 
