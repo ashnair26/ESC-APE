@@ -1,76 +1,91 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
-import { createAdminToken } from '@/utils/auth';
+import { SignJWT } from 'jose';
 import { createAdminClient } from '@/utils/supabase';
+import { randomUUID } from 'crypto'; // Import crypto for UUID generation
+
+// Prepare the secret key for jose (needs to be consistent with middleware)
+const JWT_SECRET_STRING = process.env.JWT_SECRET || 'esc-ape-admin-jwt-secret-key-change-in-production';
+const JWT_SECRET_UINT8ARRAY = new TextEncoder().encode(JWT_SECRET_STRING);
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
     const { email, password } = await request.json();
 
-    // Validate input
     if (!email || !password) {
-      return NextResponse.json(
-        { success: false, error: 'Email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Email and password are required' }, { status: 400 });
     }
 
-    // Initialize Supabase admin client
     const supabase = createAdminClient();
 
-    // Query the admin_users table for the user with the provided email
-    const { data: users, error } = await supabase
+    // Query the admin_users table
+    const { data: users, error: userError } = await supabase
       .from('admin_users')
       .select('id, email, password_hash, name, role')
       .eq('email', email.toLowerCase())
       .limit(1);
 
-    if (error) {
-      console.error('Error querying users:', error);
-      return NextResponse.json(
-        { success: false, error: 'Authentication failed' },
-        { status: 500 }
-      );
+    if (userError) {
+      console.error('Error querying admin_users:', userError);
+      return NextResponse.json({ success: false, error: 'Authentication failed (DB Query)' }, { status: 500 });
     }
-
-    // Check if user exists
     if (!users || users.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
     }
 
     const user = users[0];
 
     // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
     if (!passwordMatch) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Verify the user has the 'admin' role
+    // Verify role
     if (user.role !== 'admin') {
-        console.warn(`User ${email} attempted admin login but has role: ${user.role}`);
-        return NextResponse.json(
-            { success: false, error: 'Access denied. Not an admin user.' },
-            { status: 403 } // Forbidden
-        );
+      console.warn(`User ${email} attempted admin login but has role: ${user.role}`);
+      return NextResponse.json({ success: false, error: 'Access denied. Not an admin user.' }, { status: 403 });
     }
 
-    // Create JWT token
-    const token = createAdminToken({
-      sub: user.id,
-      email: user.email,
-      name: user.name || '',
-      role: user.role, // Should be 'admin' now
-    });
+    // --- Session Management ---
+    const sessionId = randomUUID(); // Generate a unique session ID
+    const sessionExpiryHours = 2;
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + sessionExpiryHours);
+
+    // Insert session into database
+    const { error: sessionError } = await supabase
+      .from('admin_sessions') // Target the correct table
+      .insert({
+        session_id: sessionId,
+        admin_id: user.id,
+        expires_at: expiresAt.toISOString(),
+        // Optionally store IP address and User Agent from request headers
+        ip_address: request.ip,
+        user_agent: request.headers.get('user-agent')
+      });
+
+    if (sessionError) {
+        console.error('Error inserting admin session:', sessionError);
+        // Decide if login should fail if session insert fails (potentially yes for security)
+        return NextResponse.json({ success: false, error: 'Failed to create session' }, { status: 500 });
+    }
+    // --- End Session Management ---
+
+
+    // Create JWT token using jose, including the session ID
+    const token = await new SignJWT({
+        email: user.email,
+        name: user.name || '',
+        role: user.role,
+        sessionId: sessionId // Include session ID in the token payload
+      })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject(user.id)
+      .setIssuedAt()
+      .setExpirationTime(`${sessionExpiryHours}h`) // Use variable for consistency
+      .sign(JWT_SECRET_UINT8ARRAY);
 
     // Create response
     const response = NextResponse.json({
@@ -90,7 +105,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * sessionExpiryHours, // Match JWT expiry
       path: '/',
     });
 
@@ -103,9 +118,9 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json(
-      { success: false, error: 'An error occurred during login' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'An error occurred during login' }, { status: 500 });
   }
 }
+
+// Ensure this route uses Node.js runtime because it uses 'crypto' for randomUUID
+export const runtime = 'nodejs';

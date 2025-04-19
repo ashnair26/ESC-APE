@@ -1,6 +1,8 @@
 import './globals.css';
 import './fonts.css';
 import { Inter } from 'next/font/google';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { ApiProvider } from '@/components/api/ApiProvider'; // Import ApiProvider
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,7 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${inter.className}`}>
-        {children}
+        <AuthProvider>
+          <ApiProvider> {/* Wrap children with ApiProvider */}
+            {children}
+          </ApiProvider>
+        </AuthProvider>
       </body>
     </html>
   );
