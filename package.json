@@ -1,0 +1,19 @@
+{
+  "name": "esc-ape",
+  "version": "1.0.0",
+  "description": "ESC-APE Creator Engine",
+  "scripts": {
+    "setup-db": "node scripts/setup_supabase.js",
+    "create-admin": "node scripts/create_admin_user.js",
+    "test-login": "node scripts/test_login.js",
+    "start-servers": "python mock_servers.py start",
+    "dev": "cd web && npm run dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

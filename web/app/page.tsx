@@ -2,22 +2,24 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/auth/useAuth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
+    // If user is authenticated, redirect to dashboard
+    // Otherwise, redirect to login page
+    if (!loading) {
+      if (user) {
         router.push('/dashboard');
       } else {
-        router.push('/login');
+        router.push('/admin/login');
       }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [router, user, loading]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

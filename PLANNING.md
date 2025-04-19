@@ -223,6 +223,157 @@ ESCAPE/
 
 All identities mapped to a unified `users` record in Supabase.
 
+### 🔐 Privy Integration
+*Detailed implementation for the authentication strategy*
+
+#### Installation & Setup
+```bash
+# Install Privy SDK packages
+npm i @privy-io/react-auth @privy-io/server-auth
+```
+
+#### Environment Configuration
+```env
+# Server-side authentication
+PRIVY_APP_ID=<your_privy_app_id>
+PRIVY_APP_SECRET=<your_privy_secret>
+
+# Client-side configuration
+NEXT_PUBLIC_PRIVY_APP_ID=<your_privy_app_id>
+```
+
+#### Client Implementation
+```typescript
+// frontend/src/providers/auth-provider.tsx
+import { PrivyProvider } from '@privy-io/react-auth';
+
+export function AuthProvider({ children }) {
+  return (
+    <PrivyProvider
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
+      config={{
+        loginMethods: ['wallet', 'twitter', 'farcaster'],
+        appearance: {
+          theme: 'light',
+          accentColor: 'var(--color-primary)'
+        },
+        embeddedWallets: {
+          createOnLogin: 'users-without-wallets'
+        }
+      }}
+      onSuccess={(user) => {
+        // Sync with Supabase
+        supabaseSync(user);
+      }}
+    >
+      {children}
+    </PrivyProvider>
+  );
+}
+```
+
+#### Server Verification
+```typescript
+// backend/auth/verify.ts
+import { PrivyClient } from '@privy-io/server-auth';
+
+const privyClient = new PrivyClient(
+  process.env.PRIVY_APP_ID,
+  process.env.PRIVY_APP_SECRET
+);
+
+export async function verifyPrivyToken(token: string) {
+  try {
+    const verifiedUser = await privyClient.verifyAuthToken(token);
+    return verifiedUser;
+  } catch (error) {
+    console.error('Privy token verification failed:', error);
+    return null;
+  }
+}
+```
+
+#### Supabase Synchronization
+```typescript
+// frontend/src/lib/auth/supabase-sync.ts
+export async function supabaseSync(privyUser) {
+  const { data, error } = await supabase.rpc('upsert_user', {
+    wallet_address: privyUser.wallet?.address || null,
+    twitter_handle: privyUser.twitter?.username || null,
+    farcaster_fid: privyUser.farcaster?.fid || null,
+    display_name: privyUser.name || null,
+    avatar_url: privyUser.avatar || null
+  });
+  
+  if (error) {
+    console.error('Failed to sync user with Supabase:', error);
+    return false;
+  }
+  
+  return data;
+}
+```
+
+#### Authentication Flows & Callbacks
+
+| Flow | Callback URL | Description |
+|------|--------------|-------------|
+| Standard Login | `/auth/callback/privy` | Handle post-authentication redirect |
+| Wallet Connect | `/auth/wallet/callback` | Process wallet connection |
+| Social Auth | `/auth/social/callback` | Handle social login completion |
+
+#### Error Handling & Recovery
+
+| Error State | User Experience | System Action | Recovery |
+|-------------|----------------|--------------|----------|
+| `login_cancelled` | Toast: "Login cancelled" | No state change | Re-prompt on protected actions |
+| `token_expired` | Toast: "Session expired" | Clear local session | Silent re-auth attempt |
+| `network_error` | Banner: "Connection issues" | Retry with backoff | Offer offline mode if available |
+| `account_conflict` | Dialog: "Link accounts?" | Pause auth flow | Guide through account merging |
+
+#### Integration with MCP
+
+The Privy authentication flow integrates with the MCP architecture through:
+
+1. The `auth` MCP server which handles token verification
+2. User identity data passed to Supabase MCP for persistence
+3. Session management via the client's context providers
+
+#### Recommended Testing Scenarios
+
+| Test Case | Expected Outcome |
+|-----------|-----------------|
+| `test_wallet_only_login` | New `users` row with wallet address, social fields NULL |
+| `test_wallet_plus_twitter_merge` | Existing row updated; `user.identities.length === 2` |
+| `test_farcaster_permissions` | User grants read+write permissions to Farcaster scope |
+| `test_jwt_tampering` | API returns 401 Unauthorized |
+| `test_session_expiry` | Silent refresh token attempt before logout |
+
+#### Authentication Sequence
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client as ESCAPE Client
+    participant Privy as Privy SDK
+    participant API as ESCAPE API
+    participant Supabase
+    
+    User->>Client: Clicks Login
+    Client->>Privy: Open auth modal
+    User->>Privy: Select login method
+    Privy->>User: Request permissions
+    User->>Privy: Grant permissions
+    Privy->>Client: Return ID token
+    Client->>API: Send token for verification
+    API->>Privy: Verify token
+    Privy->>API: Token verified + user data
+    API->>Supabase: upsert_user(wallet, twitter, fid)
+    Supabase->>API: Success response
+    API->>Client: Set authenticated session
+    Client->>User: Redirect to dashboard
+```
+
 ---
 
 ## 🧩 Platform Modules
@@ -314,6 +465,88 @@ All identities mapped to a unified `users` record in Supabase.
    - Creating unified user accounts
    - Session management
    - Authentication data is synced to Supabase for persistence
+
+### 🔒 Admin Dashboard Authentication
+*Dedicated login system for platform administrators - separate from Privy*
+
+#### Overview
+The Admin Dashboard uses a completely separate authentication system from the Privy-based authentication used for regular users and creators. While regular users (community members and creators) authenticate via Privy, platform administrators access the admin dashboard through this dedicated system with enhanced security controls.
+
+This separation ensures that admin access remains independent from the Web3/social authentication mechanisms used by the platform's end users.
+
+#### Admin Users Schema
+```
+table: admin_user
+- id (serial, PK)
+- email (text, unique)
+- password_hash (text)  # bcrypt hashed passwords
+- role (text)
+- name (text)
+- last_login (timestampz)
+- created_at (timestampz)
+```
+
+#### Admin Sessions Schema
+```
+table: admin_sessions
+- id (serial, PK)
+- session_id (uuid, unique)
+- admin_id (integer, FK → admin_user.id)
+- created_at (timestampz)
+- expires_at (timestampz)
+- ip_address (text)
+- user_agent (text)
+```
+
+#### Implementation Details
+
+1. **Password Security**
+   - Passwords are hashed using bcrypt with appropriate cost factor
+   - Hashes are never exposed to the frontend
+   - Password complexity requirements enforced on signup/change
+
+2. **Authentication Process**
+   ```javascript
+   // Login flow
+   1. Admin submits email and password
+   2. Server retrieves admin by email from Supabase
+   3. Server compares password against stored hash using bcrypt
+   4. On success, generate unique session ID and store in admin_sessions
+   5. Create JWT with admin ID, email, role, and session ID
+   6. Set httpOnly secure cookie with JWT
+   7. Return success response with minimal admin details
+   ```
+
+3. **Session Management**
+   - Sessions tracked in database for immediate revocation capability
+   - Sessions include device info (IP, user agent) for audit purposes
+   - Sessions expire after configurable time period (default: 2 hours)
+
+4. **Route Protection**
+   - Protected routes use middleware to verify JWT
+   - Middleware also checks that session exists and is valid in database
+   - Role-based access ensures admins only access authorized routes
+
+5. **Security Measures**
+   - Rate limiting on login attempts (5 per 15-minute window)
+   - CSRF protection on all admin routes
+   - Consistent timing for failed logins to prevent timing attacks
+   - Secure, httpOnly, SameSite=strict cookies to prevent XSS
+
+#### Logout & Session Management
+```javascript
+// Logout flow
+1. Retrieve token from cookie and verify
+2. Delete session from admin_sessions table
+3. Clear the admin_token cookie
+4. Return success response
+```
+
+#### Integration with MCP
+The admin authentication system integrates with the project's MCP architecture:
+- Uses Supabase MCP server for data storage and retrieval
+- Admin session data is never exposed through public APIs
+- Secrets (JWT signing keys) managed through the secrets management system
 
 ### Authentication Flow
 
@@ -703,6 +936,204 @@ Themes update dynamically on onboarding with custom `[data-theme]` class selecto
 - **Never hallucinate libraries or functions** – only use known, verified Python packages.
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
 - **Never delete or overwrite existing code** unless explicitly instructed to or if part of a task from `TASK.md`.
+- **Generate new files instead of modifying existing ones** when adding substantial new functionality.
+- **Document planned changes before implementation** for review and approval.
+- **Respect the "Protected Files" list** in the section below for files that should never be modified automatically.
+
+### 🔒 AI Code Generation Safeguards
+*Guidelines for preventing problematic AI code modifications*
+
+> **IMPORTANT INSTRUCTION**: All AI assistants (including Augment Code) MUST read this entire planning document at the beginning of EACH new conversation or session. AI tools must adhere to these guidelines without exception and should reference this document regularly during development to ensure compliance.
+
+#### Protected Files
+The following files should NEVER be modified automatically by AI tools:
+```
+# Core system files (never modify)
+core/auth/privy_client.py
+core/config.py
+core/db/supabase_client.py
+core/secrets.py
+
+# Stable API implementations
+api/routes/auth.py
+api/routes/users.py
+
+# Frontend core components
+frontend/src/providers/auth-provider.tsx
+frontend/src/lib/auth/supabase-sync.ts
+```
+
+#### Code Generation Workflow
+1. **Plan → Review → Generate → Validate**
+   - AI proposes changes in natural language first
+   - Human approves specific file changes
+   - AI generates code in new or approved files only
+   - Automated tests validate changes don't break functionality
+
+2. **Incremental Approach**
+   - Generate one component/function at a time
+   - Integrate and test before moving to the next component
+   - Commit working code frequently
+
+3. **Explicit File Operations**
+   - Use markers like `// code-gen: create file path/to/new-file.ts`
+   - Never use markers to modify existing files
+   - Generate complete files rather than partial updates
+
+#### Version Control Integration
+- Commit before any significant AI-guided changes
+- Use feature branches for experimental changes
+- Include commit message indicating AI-assisted work
+
+#### Implementation Guards
+```python
+# Example pattern for preventing accidental overrides
+def update_file(file_path, new_content):
+    """Update file with new content, with safeguards.
+    
+    Args:
+        file_path: Path to the file to update
+        new_content: New file content
+    
+    Returns:
+        bool: Success or failure
+    """
+    # Check if file is protected
+    PROTECTED_FILES = load_protected_files_list()
+    if file_path in PROTECTED_FILES:
+        logging.warning(f"Attempted modification of protected file: {file_path}")
+        return False
+    
+    # Always create backup before modifying
+    create_backup(file_path)
+    
+    # Only proceed if file exists (no creating new core files)
+    if not os.path.exists(file_path):
+        logging.warning(f"Attempted to modify non-existent file: {file_path}")
+        return False
+    
+    with open(file_path, 'w') as f:
+        f.write(new_content)
+    
+    return True
+```
+
+#### Recovery Procedures
+In case of problematic AI-generated code:
+
+1. **Immediate Fixes**
+   - Revert to last known good commit
+   - Use backups from `core/backups` directory
+   - Run `scripts/recovery.py` to restore system state
+
+2. **Root Cause Diagnosis**
+   - Check `logs/ai_operations.log` for AI actions
+   - Analyze which instructions led to problematic behavior
+   - Update planning.md with additional safeguards
+
+3. **Prevention Tactics**
+   - Add problematic file to Protected Files list
+   - Create a template for the affected component type
+   - Break task into smaller, isolated changes
+- **Generate new files instead of modifying existing ones** when adding substantial new functionality.
+- **Document planned changes before implementation** for review and approval.
+- **Respect the "Protected Files" list** in the section below for files that should never be modified automatically.
+
+### 🔒 AI Code Generation Safeguards
+*Guidelines for preventing problematic AI code modifications*
+
+> **IMPORTANT INSTRUCTION**: All AI assistants (including Augment Code) MUST read this entire planning document at the beginning of EACH new conversation or session. AI tools must adhere to these guidelines without exception and should reference this document regularly during development to ensure compliance.
+
+#### Protected Files
+The following files should NEVER be modified automatically by AI tools:
+```
+# Core system files (never modify)
+core/auth/privy_client.py
+core/config.py
+core/db/supabase_client.py
+core/secrets.py
+
+# Stable API implementations
+api/routes/auth.py
+api/routes/users.py
+
+# Frontend core components
+frontend/src/providers/auth-provider.tsx
+frontend/src/lib/auth/supabase-sync.ts
+```
+
+#### Code Generation Workflow
+1. **Plan → Review → Generate → Validate**
+   - AI proposes changes in natural language first
+   - Human approves specific file changes
+   - AI generates code in new or approved files only
+   - Automated tests validate changes don't break functionality
+
+2. **Incremental Approach**
+   - Generate one component/function at a time
+   - Integrate and test before moving to the next component
+   - Commit working code frequently
+
+3. **Explicit File Operations**
+   - Use markers like `// code-gen: create file path/to/new-file.ts`
+   - Never use markers to modify existing files
+   - Generate complete files rather than partial updates
+
+#### Version Control Integration
+- Commit before any significant AI-guided changes
+- Use feature branches for experimental changes
+- Include commit message indicating AI-assisted work
+
+#### Implementation Guards
+```python
+# Example pattern for preventing accidental overrides
+def update_file(file_path, new_content):
+    """Update file with new content, with safeguards.
+    
+    Args:
+        file_path: Path to the file to update
+        new_content: New file content
+    
+    Returns:
+        bool: Success or failure
+    """
+    # Check if file is protected
+    PROTECTED_FILES = load_protected_files_list()
+    if file_path in PROTECTED_FILES:
+        logging.warning(f"Attempted modification of protected file: {file_path}")
+        return False
+    
+    # Always create backup before modifying
+    create_backup(file_path)
+    
+    # Only proceed if file exists (no creating new core files)
+    if not os.path.exists(file_path):
+        logging.warning(f"Attempted to modify non-existent file: {file_path}")
+        return False
+    
+    with open(file_path, 'w') as f:
+        f.write(new_content)
+    
+    return True
+```
+
+#### Recovery Procedures
+In case of problematic AI-generated code:
+
+1. **Immediate Fixes**
+   - Revert to last known good commit
+   - Use backups from `core/backups` directory
+   - Run `scripts/recovery.py` to restore system state
+
+2. **Root Cause Diagnosis**
+   - Check `logs/ai_operations.log` for AI actions
+   - Analyze which instructions led to problematic behavior
+   - Update planning.md with additional safeguards
+
+3. **Prevention Tactics**
+   - Add problematic file to Protected Files list
+   - Create a template for the affected component type
+   - Break task into smaller, isolated changes
 
 ### 📦 Component Guidelines
 **Buttons**
@@ -1139,12 +1570,100 @@ The Progress Card maintains consistent UI patterns:
 * Responsive design adapts to all device sizes
 * Animations celebrate milestone completions
 
-### 🎮 User Experience Flow
+## 🛠️ Project Maintenance & Stability Guidelines
+*Best practices for maintaining code quality and preventing regressions*
 
-1. **Orientation**: New users see simplified version highlighting immediate next steps
-2. **Engagement**: As users progress, more of the journey map is revealed
-3. **Guidance**: When stuck, contextual hints appear with increasing specificity
-4. **Celebration**: Milestone completions trigger visual rewards and animations
-5. **Preview**: Next stage teasers create anticipation for continued engagement
+### 📋 Development Workflow
 
-The Progress Tracking System transforms complex progression mechanisms into an intuitive, game-like experience that keeps users engaged while helping them navigate the Creator's unique community journey.
+#### Code Contribution Process
+1. **Task Selection**: Choose a task from TASK.md
+2. **Branch Creation**: Create a feature branch from main
+3. **Implementation**: Write code following the guidelines
+4. **Testing**: Write and run tests for new functionality
+5. **Review**: Request code review from team members
+6. **Merge**: Merge changes to main after approval
+7. **Update**: Update TASK.md to mark task as complete
+
+#### Change Management
+* Document all significant changes in CHANGELOG.md
+* Tag releases using semantic versioning (MAJOR.MINOR.PATCH)
+* Include migration scripts for database schema changes
+
+### 🔍 Quality Assurance
+
+#### Testing Strategy
+* **Unit Tests**: Test individual functions and components
+* **Integration Tests**: Test interactions between subsystems
+* **End-to-End Tests**: Test complete user journeys
+* **Manual Testing**: Verify visual elements and user experience
+* **Performance Testing**: Ensure system performs under load
+
+#### Monitoring & Error Tracking
+* Implement logging throughout the application
+* Set up error tracking system (e.g., Sentry)
+* Monitor system health metrics (e.g., API response times)
+* Create dashboards for key performance indicators
+
+### 📚 Documentation Requirements
+
+#### Code Documentation
+* Document all functions with docstrings
+* Include usage examples for complex functions
+* Document component props and state management
+* Explain architectural decisions in comments
+
+#### User Documentation
+* Create detailed guides for creators and community members
+* Include troubleshooting sections for common issues
+* Provide video tutorials for key workflows
+* Update documentation with each release
+
+---
+
+## 🛠️ Project Maintenance & Stability Guidelines
+*Best practices for maintaining code quality and preventing regressions*
+
+### 📋 Development Workflow
+
+#### Code Contribution Process
+1. **Task Selection**: Choose a task from TASK.md
+2. **Branch Creation**: Create a feature branch from main
+3. **Implementation**: Write code following the guidelines
+4. **Testing**: Write and run tests for new functionality
+5. **Review**: Request code review from team members
+6. **Merge**: Merge changes to main after approval
+7. **Update**: Update TASK.md to mark task as complete
+
+#### Change Management
+* Document all significant changes in CHANGELOG.md
+* Tag releases using semantic versioning (MAJOR.MINOR.PATCH)
+* Include migration scripts for database schema changes
+
+### 🔍 Quality Assurance
+
+#### Testing Strategy
+* **Unit Tests**: Test individual functions and components
+* **Integration Tests**: Test interactions between subsystems
+* **End-to-End Tests**: Test complete user journeys
+* **Manual Testing**: Verify visual elements and user experience
+* **Performance Testing**: Ensure system performs under load
+
+#### Monitoring & Error Tracking
+* Implement logging throughout the application
+* Set up error tracking system (e.g., Sentry)
+* Monitor system health metrics (e.g., API response times)
+* Create dashboards for key performance indicators
+
+### 📚 Documentation Requirements
+
+#### Code Documentation
+* Document all functions with docstrings
+* Include usage examples for complex functions
+* Document component props and state management
+* Explain architectural decisions in comments
+
+#### User Documentation
+* Create detailed guides for creators and community members
+* Include troubleshooting sections for common issues
+* Provide video tutorials for key workflows
+* Update documentation with each release

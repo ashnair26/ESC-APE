@@ -78,4 +78,5 @@ def register_tools_from_server(source_mcp: FastMCP, prefix: Optional[str] = None
         mcp.register_tool(
             name=tool_name,
             func=tool.func,
-            description=tool.descrip
+            description=tool.description
+        )

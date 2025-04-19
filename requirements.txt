@@ -11,7 +11,7 @@ pyjwt>=2.6.0
 # Using httpx for Sanity API requests
 
 # Privy Authentication Dependencies
-privy-sdk>=0.1.0
+privy-python-sdk>=0.1.0
 
 # BASE Blockchain Dependencies
 web3>=6.0.0

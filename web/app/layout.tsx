@@ -1,8 +1,7 @@
 import './globals.css';
 import './fonts.css';
 import { Inter } from 'next/font/google';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { ApiProvider } from '@/components/api/ApiProvider'; // Import ApiProvider
+import { Providers } from '@/components/providers/Providers'; // Import the new Providers component
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,11 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${inter.className}`}>
-        <AuthProvider>
-          <ApiProvider> {/* Wrap children with ApiProvider */}
-            {children}
-          </ApiProvider>
-        </AuthProvider>
+        <Providers> {/* Use the Providers component to wrap children */}
+          {children}
+        </Providers>
       </body>
     </html>
   );

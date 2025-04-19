@@ -10,10 +10,10 @@ module.exports = {
       sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
       lemonmilk: ['Lemonmilk', 'ui-sans-serif', 'system-ui'],
-      manlymebb: ['ManlyMenBB', 'ui-sans-serif', 'system-ui'],
+      manlymebb: ['Inter', 'ui-sans-serif', 'system-ui'],
       // Theme font families
       'escape-heading': ['Lemonmilk', 'ui-sans-serif', 'system-ui'],
-      'escape-body': ['ManlyMenBB', 'ui-sans-serif', 'system-ui'],
+      'escape-body': ['Inter', 'ui-sans-serif', 'system-ui'],
       'default-heading': ['var(--font-inter)', 'ui-sans-serif', 'system-ui'],
       'default-body': ['var(--font-inter)', 'ui-sans-serif', 'system-ui'],
     },

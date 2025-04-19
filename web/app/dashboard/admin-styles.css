@@ -1,0 +1,120 @@
+/* Admin Dashboard Styles */
+
+.admin-dashboard {
+  --primary-color: #c20023;
+  --primary-hover: #a10018;
+  --secondary-color: #010101;
+  --text-light: #ffffff;
+  --text-dark: #333333;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --background-light: #f3f4f6;
+  --background-dark: #111827;
+  --card-light: #ffffff;
+  --card-dark: #1f2937;
+  --border-light: #e5e7eb;
+  --border-dark: #374151;
+}
+
+/* Dark mode styles */
+.dark .admin-dashboard {
+  color-scheme: dark;
+}
+
+/* Custom button styles */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+}
+
+.admin-btn-primary {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+.admin-btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Custom card styles */
+.admin-card {
+  background-color: var(--card-light);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dark .admin-card {
+  background-color: var(--card-dark);
+}
+
+/* Custom form styles */
+.admin-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.375rem;
+  background-color: var(--card-light);
+  color: var(--text-dark);
+}
+
+.dark .admin-input {
+  border-color: var(--border-dark);
+  background-color: var(--card-dark);
+  color: var(--text-light);
+}
+
+/* Table styles */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.admin-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dark .admin-table th,
+.dark .admin-table td {
+  border-color: var(--border-dark);
+}
+
+/* Status badges */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.admin-badge-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.admin-badge-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+}
+
+.admin-badge-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+}

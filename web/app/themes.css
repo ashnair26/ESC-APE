@@ -4,7 +4,7 @@
 .theme-escape {
   /* Typography */
   --font-heading: 'Lemonmilk', ui-sans-serif, system-ui;
-  --font-body: 'ManlyMenBB', ui-sans-serif, system-ui;
+  --font-body: 'Inter', ui-sans-serif, system-ui;
 
   /* Colors */
   --color-primary: #c20023;

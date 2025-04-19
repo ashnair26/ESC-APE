@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import {
   ServerIcon,
@@ -60,6 +62,10 @@ const realServers = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { user, loading, logout, checkAuth } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   // Real stats
   const [stats, setStats] = useState({
     servers: realServers.length,
@@ -68,13 +74,33 @@ export default function DashboardPage() {
     users: 1,
   });
 
-  // Mock user data
-  const user = {
-    id: 'admin-user',
-    username: 'admin',
-    email: 'admin@escape.io',
-    role: 'admin',
-    scopes: ['admin:access', 'mcp:access']
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      if (!loading) {
+        if (!user) {
+          // Try to check auth one more time
+          const isAuthenticated = await checkAuth();
+          if (!isAuthenticated) {
+            router.push('/admin/login');
+          }
+        }
+      }
+    };
+
+    checkAuthentication();
+  }, [loading, user, router, checkAuth]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      router.push('/admin/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -85,15 +111,41 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mx-auto"></div>
+          <p className="mt-4 text-gray-700 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Will redirect in useEffect if not authenticated
+  if (!user) {
+    return null;
+  }
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Welcome to the ESCAPE Creator Engine admin dashboard.
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Welcome to the ESCAPE Creator Engine admin dashboard.
+          </p>
+        </div>
+        <button
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
+        </button>
       </div>
 
 
@@ -147,10 +199,10 @@ export default function DashboardPage() {
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Username
+                  Name
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {user?.username || 'N/A'}
+                  {user?.name || 'N/A'}
                 </dd>
               </div>
               <div className="sm:col-span-1">
@@ -171,18 +223,20 @@ export default function DashboardPage() {
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Scopes
+                  Authentication Status
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
                   <div className="flex flex-wrap gap-2">
-                    {user?.scopes?.map((scope) => (
-                      <span
-                        key={scope}
-                        className="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"
-                      >
-                        {scope}
-                      </span>
-                    )) || 'N/A'}
+                    <span
+                      className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300"
+                    >
+                      Authenticated
+                    </span>
+                    <span
+                      className="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"
+                    >
+                      {user?.role || 'user'}
+                    </span>
                   </div>
                 </dd>
               </div>

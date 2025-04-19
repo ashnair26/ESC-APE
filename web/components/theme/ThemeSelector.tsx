@@ -13,7 +13,7 @@ const themeOptions: ThemeOption[] = [
   {
     name: 'escape',
     label: 'ESCAPE',
-    description: 'Bold Lemonmilk headings with ManlyMenBB body text',
+    description: 'Bold Lemonmilk headings with Inter body text',
   },
   {
     name: 'default',
