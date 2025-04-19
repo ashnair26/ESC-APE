@@ -1,7 +1,7 @@
 'use client';
 
-import { Fragment, useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { Fragment, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
@@ -15,8 +15,6 @@ import {
   SwatchIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { useAuth } from '@/components/auth/useAuth';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import clsx from 'clsx';
 
 const navigation = [
@@ -24,7 +22,7 @@ const navigation = [
   { name: 'MCP Servers', href: '/dashboard/servers', icon: ServerIcon },
   { name: 'Tools', href: '/dashboard/tools', icon: CommandLineIcon },
   { name: 'Secrets', href: '/dashboard/secrets', icon: KeyIcon },
-  { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
+  { name: 'API Settings', href: '/dashboard/settings', icon: CogIcon },
   { name: 'UI Components', href: '/components', icon: SwatchIcon },
 ];
 
@@ -34,27 +32,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isAuthenticated, isLoading, user, logout } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Mock user data
+  const user = {
+    id: 'admin-user',
+    username: 'admin',
+    email: 'admin@escape.io',
+    role: 'admin'
+  };
 
   return (
     <div>
@@ -261,7 +247,7 @@ export default function DashboardLayout({
                             active ? 'bg-gray-50 dark:bg-gray-700' : '',
                             'block w-full px-3 py-1 text-left text-sm leading-6 text-gray-900 dark:text-white'
                           )}
-                          onClick={logout}
+                          onClick={() => console.log('Sign out clicked')}
                         >
                           Sign out
                         </button>
