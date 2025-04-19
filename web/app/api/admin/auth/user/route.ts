@@ -1,51 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-
-// JWT secret key - must match the one used for login
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { verifyAdminToken } from '@/utils/auth';
+import { createAdminClient } from '@/utils/supabase';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the token from the cookie
-    const cookieStore = cookies();
-    const token = cookieStore.get('admin_token')?.value;
+    // Verify admin token
+    const adminData = await verifyAdminToken(request);
 
-    if (!token) {
-      return NextResponse.json({
-        success: false,
-        error: 'Not authenticated',
-      }, { status: 401 });
+    if (!adminData) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
 
-    // Verify the token
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
-      
-      // Return the user information
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: decoded.sub,
-          email: decoded.email,
-          name: decoded.name,
-          role: decoded.role,
-        },
-      });
-    } catch (error) {
-      // If token verification fails, clear the cookie
-      cookieStore.delete('admin_token');
-      
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid or expired token',
-      }, { status: 401 });
-    }
-  } catch (error) {
-    console.error('Auth verification error:', error);
+    // For performance, we can return the token data directly
+    // This avoids an extra database query on every auth check
     return NextResponse.json({
-      success: false,
-      error: 'An error occurred during authentication verification',
-    }, { status: 500 });
+      success: true,
+      user: {
+        id: adminData.sub,
+        email: adminData.email,
+        name: adminData.name || '',
+        role: adminData.role,
+      },
+      source: 'token' // Indicate data came from token
+    });
+  } catch (error) {
+    console.error('Error fetching admin user data:', error); // Keep general error logging
+    return NextResponse.json(
+      { success: false, error: 'An error occurred while fetching user data' },
+      { status: 500 }
+    );
   }
 }

@@ -1,135 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client with service role key for admin operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-// JWT secret key - in production, use a strong secret from environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const TOKEN_EXPIRY = '24h'; // Token expires in 24 hours
-
-// Rate limiting configuration
-const MAX_LOGIN_ATTEMPTS = 5; // Maximum number of failed login attempts
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes in milliseconds
+import bcrypt from 'bcryptjs';
+import { createAdminToken } from '@/utils/auth';
+import { createAdminClient } from '@/utils/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, rememberMe } = await request.json();
-    const ip = request.headers.get('x-forwarded-for') || request.ip || 'unknown';
+    // Parse request body
+    const { email, password } = await request.json();
 
     // Validate input
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { success: false, error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Check for rate limiting
-    const { count } = await supabase
-      .from('login_attempts')
-      .select('id', { count: 'exact' })
+    // Initialize Supabase admin client
+    const supabase = createAdminClient();
+
+    // Query the admin_users table for the user with the provided email
+    const { data: users, error } = await supabase
+      .from('admin_users')
+      .select('id, email, password_hash, name, role')
       .eq('email', email.toLowerCase())
-      .eq('success', false)
-      .eq('ip_address', ip)
-      .gte('created_at', new Date(Date.now() - RATE_LIMIT_WINDOW).toISOString());
+      .limit(1);
 
-    if (count && count >= MAX_LOGIN_ATTEMPTS) {
-      // Log the blocked attempt
-      await supabase.from('login_attempts').insert({
-        email: email.toLowerCase(),
-        ip_address: ip,
-        success: false
-      });
-
+    if (error) {
+      console.error('Error querying users:', error);
       return NextResponse.json(
-        { error: 'Too many failed login attempts. Please try again later.' },
-        { status: 429 }
+        { success: false, error: 'Authentication failed' },
+        { status: 500 }
       );
     }
 
-    // Find the user in Supabase
-    const { data: user, error: userError } = await supabase
-      .from('admin_users')
-      .select('id, email, name, password_hash, role')
-      .eq('email', email.toLowerCase())
-      .single();
-
-    if (userError || !user) {
-      // Log the failed attempt
-      await supabase.from('login_attempts').insert({
-        email: email.toLowerCase(),
-        ip_address: ip,
-        success: false
-      });
-
+    // Check if user exists
+    if (!users || users.length === 0) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { success: false, error: 'Invalid email or password' },
         { status: 401 }
       );
     }
+
+    const user = users[0];
 
     // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    if (!passwordMatch) {
-      // Log the failed attempt
-      await supabase.from('login_attempts').insert({
-        email: email.toLowerCase(),
-        ip_address: ip,
-        success: false
-      });
 
+    if (!passwordMatch) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { success: false, error: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
-    // Update last login timestamp
-    await supabase
-      .from('admin_users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', user.id);
+    // Verify the user has the 'admin' role
+    if (user.role !== 'admin') {
+        console.warn(`User ${email} attempted admin login but has role: ${user.role}`);
+        return NextResponse.json(
+            { success: false, error: 'Access denied. Not an admin user.' },
+            { status: 403 } // Forbidden
+        );
+    }
 
-    // Log the successful attempt
-    await supabase.from('login_attempts').insert({
-      email: email.toLowerCase(),
-      ip_address: ip,
-      success: true
+    // Create JWT token
+    const token = createAdminToken({
+      sub: user.id,
+      email: user.email,
+      name: user.name || '',
+      role: user.role, // Should be 'admin' now
     });
 
-    // Create a JWT token
-    const token = jwt.sign(
-      {
-        sub: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        iat: Math.floor(Date.now() / 1000),
-      },
-      JWT_SECRET,
-      { expiresIn: rememberMe ? '30d' : TOKEN_EXPIRY }
-    );
-
-    // Set the token in an HTTP-only cookie
-    const cookieStore = cookies();
-    cookieStore.set('admin_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60, // 30 days or 24 hours in seconds
-      path: '/',
-    });
-
-    // Return success with the token (for client-side storage if needed)
-    return NextResponse.json({
+    // Create response
+    const response = NextResponse.json({
       success: true,
-      token,
       user: {
         id: user.id,
         email: user.email,
@@ -137,10 +82,29 @@ export async function POST(request: NextRequest) {
         role: user.role,
       },
     });
+
+    // Set cookie in the response
+    response.cookies.set({
+      name: 'admin_token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24, // 24 hours
+      path: '/',
+    });
+
+    // Update last login timestamp
+    await supabase
+      .from('admin_users')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', user.id);
+
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'An error occurred during login' },
+      { success: false, error: 'An error occurred during login' },
       { status: 500 }
     );
   }

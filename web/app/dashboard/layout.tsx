@@ -1,7 +1,8 @@
 'use client';
 
-import { Fragment, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { Fragment, useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
@@ -33,14 +34,29 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  // Note: Removed checkAuth as it's not used when auth check is disabled
+  // Note: Re-added checkAuth dependency if needed by the original logic, but keeping the simplified effect for now.
+  // Note: checkAuth not needed when client-side check is disabled
+  // Re-adding checkAuth as it might be needed by other parts, though the effect below doesn't use it directly.
+  const { user, logout, loading, checkAuth } = useAuth();
 
-  // Mock user data
-  const user = {
-    id: 'admin-user',
-    username: 'admin',
-    email: 'admin@escape.io',
-    role: 'admin'
-  };
+  // Re-enabled client-side auth check
+  useEffect(() => {
+    // This effect runs when loading or user state changes from AuthContext.
+    // We only care about the state *after* the initial load is complete.
+    if (!loading) {
+      // If loading is done and there's no user object, redirect.
+      if (!user) {
+        console.log('DashboardLayout: Initial load complete, user is null. Redirecting.');
+        router.push('/admin/login');
+      } else {
+        // User is authenticated and loading is done. Allow access.
+        console.log('DashboardLayout: Initial load complete, user found:', user.email);
+      }
+    }
+    // Depend only on user and loading state from the context.
+  }, [user, loading, router]); // Keeping simplified dependencies
 
   return (
     <div>
@@ -222,7 +238,7 @@ export default function DashboardLayout({
                       className="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white"
                       aria-hidden="true"
                     >
-                      {user?.username || user?.id}
+                      {user?.name || user?.email}
                     </span>
                     <ChevronDownIcon
                       className="ml-2 h-5 w-5 text-gray-400 dark:text-gray-500"
@@ -247,7 +263,7 @@ export default function DashboardLayout({
                             active ? 'bg-gray-50 dark:bg-gray-700' : '',
                             'block w-full px-3 py-1 text-left text-sm leading-6 text-gray-900 dark:text-white'
                           )}
-                          onClick={() => console.log('Sign out clicked')}
+                          onClick={logout}
                         >
                           Sign out
                         </button>
