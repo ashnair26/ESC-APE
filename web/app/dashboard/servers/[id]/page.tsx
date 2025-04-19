@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useApi } from '@/components/api/useApi';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { ServerIcon, CommandLineIcon } from '@heroicons/react/24/outline';
+import { ServerIcon, CommandLineIcon, ArrowLeftIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { checkServerStatus } from '@/utils/server-status';
 
 interface Tool {
   name: string;
@@ -17,12 +16,56 @@ export default function ServerDetailPage() {
   const params = useParams();
   const router = useRouter();
   const serverId = params.id as string;
-  const { client } = useApi();
   const [tools, setTools] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [serverName, setServerName] = useState('');
   const [serverDescription, setServerDescription] = useState('');
+  const [serverStatus, setServerStatus] = useState<'online' | 'offline'>('offline');
+  const [serverUrl, setServerUrl] = useState('');
+
+  // Helper function to get server URL
+  const getServerUrl = (id: string): string => {
+    const serverPorts: Record<string, number> = {
+      unified: 8000,
+      git: 8004,
+      privy: 8005,
+      supabase: 8006,
+      sanity: 8007,
+      base: 8008
+    };
+
+    const port = serverPorts[id];
+    return port ? `http://localhost:${port}` : '';
+  };
+
+  // Helper function to get server name
+  const getServerName = (id: string): string => {
+    const serverNames: Record<string, string> = {
+      unified: 'Unified MCP',
+      git: 'Git MCP',
+      privy: 'Privy MCP',
+      supabase: 'Supabase MCP',
+      sanity: 'Sanity CMS',
+      base: 'BASE MCP'
+    };
+
+    return serverNames[id] || id.charAt(0).toUpperCase() + id.slice(1);
+  };
+
+  // Helper function to get server description
+  const getServerDescription = (id: string): string => {
+    const serverDescriptions: Record<string, string> = {
+      unified: 'Main unified MCP server',
+      git: 'Git repository integration server',
+      privy: 'Privy authentication integration server',
+      supabase: 'Supabase database integration server',
+      sanity: 'Sanity CMS integration server',
+      base: 'BASE blockchain integration server'
+    };
+
+    return serverDescriptions[id] || '';
+  };
 
   useEffect(() => {
     const fetchServerDetails = async () => {
@@ -30,22 +73,34 @@ export default function ServerDetailPage() {
       setError(null);
 
       try {
-        // Fetch servers to get the name and description
-        const servers = await client.listServers();
-        if (!servers[serverId]) {
+        // Get server URL
+        const url = getServerUrl(serverId);
+        if (!url) {
           throw new Error(`Server ${serverId} not found`);
         }
+        setServerUrl(url);
 
-        setServerName(serverId.charAt(0).toUpperCase() + serverId.slice(1));
-        setServerDescription(servers[serverId]);
+        // Set server name and description
+        setServerName(getServerName(serverId));
+        setServerDescription(getServerDescription(serverId));
 
-        // Fetch tools for this server
-        const toolsResponse = await client.listTools(serverId);
-        if (!toolsResponse.success) {
-          throw new Error(toolsResponse.error || 'Failed to load tools');
+        // Check if server is running
+        const isRunning = await checkServerStatus(url);
+        setServerStatus(isRunning ? 'online' : 'offline');
+
+        // Fetch tools if server is running
+        if (isRunning) {
+          try {
+            const response = await fetch(`${url}/tools`);
+            if (response.ok) {
+              const data = await response.json();
+              setTools(data.tools || []);
+            }
+          } catch (toolsErr) {
+            console.error(`Error fetching tools for ${serverId}:`, toolsErr);
+            // Don't set an error, just leave tools empty
+          }
         }
-
-        setTools(toolsResponse.tools || []);
       } catch (err) {
         console.error(`Error fetching server ${serverId} details:`, err);
         setError(`Failed to load server details: ${err}`);
@@ -55,7 +110,22 @@ export default function ServerDetailPage() {
     };
 
     fetchServerDetails();
-  }, [client, serverId]);
+
+    // Set up interval to refresh server status
+    const intervalId = setInterval(async () => {
+      try {
+        const url = getServerUrl(serverId);
+        if (url) {
+          const isRunning = await checkServerStatus(url);
+          setServerStatus(isRunning ? 'online' : 'offline');
+        }
+      } catch (err) {
+        console.error(`Error checking server status:`, err);
+      }
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [serverId]);
 
   return (
     <div>
@@ -65,20 +135,40 @@ export default function ServerDetailPage() {
             onClick={() => router.back()}
             className="mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
-            ← Back
+            <ArrowLeftIcon className="h-5 w-5" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {serverName} Server
+            {serverName}
           </h1>
+          <span
+            className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              serverStatus === 'online'
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+            }`}
+          >
+            {serverStatus}
+          </span>
         </div>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           {serverDescription}
         </p>
+        <div className="mt-2">
+          <a
+            href={serverUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+          >
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-1" />
+            {serverUrl}
+          </a>
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
         </div>
       ) : error ? (
         <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
@@ -115,8 +205,14 @@ export default function ServerDetailPage() {
                       Status
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                      <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-300">
-                        Online
+                      <span
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                          serverStatus === 'online'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                        }`}
+                      >
+                        {serverStatus}
                       </span>
                     </dd>
                   </div>

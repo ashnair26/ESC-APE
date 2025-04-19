@@ -49,10 +49,20 @@ const apiKeys = [
   },
 ];
 
+// Real server data
+const realServers = [
+  { id: 'unified', type: 'unified' },
+  { id: 'git', type: 'git' },
+  { id: 'privy', type: 'privy' },
+  { id: 'supabase', type: 'supabase' },
+  { id: 'sanity', type: 'sanity' },
+  { id: 'base', type: 'base' },
+];
+
 export default function DashboardPage() {
-  // Mock stats for demonstration
-  const [stats] = useState({
-    servers: 8,
+  // Real stats
+  const [stats, setStats] = useState({
+    servers: realServers.length,
     tools: 12,
     secrets: 8,
     users: 1,
