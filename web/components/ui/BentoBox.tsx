@@ -49,7 +49,7 @@ const BentoBox: React.FC<BentoBoxProps> = ({
       onClick={onClick}
     >
       {title && (
-        <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+        <div className="px-4 py-3">
           <h3 className="text-base font-medium text-gray-900 dark:text-white">
             {title}
           </h3>

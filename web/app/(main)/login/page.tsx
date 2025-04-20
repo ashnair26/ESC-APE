@@ -12,6 +12,9 @@ export default function LoginPage() {
   const router = useRouter();
   const { ready, authenticated, login, logout } = usePrivy(); // Import logout
 
+  // Log Privy state changes
+  console.log(`[Login Page] Privy State: ready=${ready}, authenticated=${authenticated}`);
+
   // Set up Privy animations
   useEffect(() => {
     setupPrivyAnimations();

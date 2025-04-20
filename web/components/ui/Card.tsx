@@ -30,7 +30,7 @@ const Card: React.FC<CardProps> = ({
       onClick={onClick}
     >
       {title && (
-        <div className="border-b border-gray-200 px-4 py-5 sm:px-6 dark:border-gray-700">
+        <div className="px-4 py-5 sm:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               {icon && <div className="mr-2 text-gray-500 dark:text-gray-400">{icon}</div>}
@@ -44,7 +44,7 @@ const Card: React.FC<CardProps> = ({
       )}
       <div className="px-4 py-5 sm:p-6">{children}</div>
       {footer && (
-        <div className="border-t border-gray-200 px-4 py-4 sm:px-6 dark:border-gray-700">
+        <div className="px-4 py-4 sm:px-6">
           {footer}
         </div>
       )}
