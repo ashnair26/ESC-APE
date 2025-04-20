@@ -6,14 +6,15 @@ import type { PrivyClientConfig } from '@privy-io/react-auth';
 
 // Re-define Privy config here or import from a shared config file if preferred
 const privyConfig: PrivyClientConfig = {
-  loginMethods: ['wallet', 'twitter', 'farcaster'],
+  loginMethods: ['wallet', 'twitter', 'farcaster', 'google'], // Added 'google'
   appearance: {
-    theme: 'light', // Explicitly use 'light' or 'dark'
+    theme: 'dark', // Changed to dark theme
     accentColor: '#676FFF', // Example accent color
-    // logo: 'URL_to_your_logo.png', // Optional: Add your logo URL here
+    logo: '/images/escape1.svg', // Added Escape 1 logo
+    showWalletLoginFirst: true, // Show wallet login as the first option
   },
   embeddedWallets: {
-    createOnLogin: 'users-without-wallets' // Automatically create embedded wallets for users without their own
+    createOnLogin: 'users-without-wallets', // Automatically create embedded wallets for users without their own
   },
   // Add any other configuration options here if needed
   // See: https://docs.privy.io/guide/react/configuration/privy-provider

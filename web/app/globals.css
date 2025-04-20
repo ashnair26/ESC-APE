@@ -96,3 +96,70 @@ body {
     @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
   }
 }
+
+/* Custom styling for Privy modal */
+[data-privy-dialog] {
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(8px);
+}
+
+[data-privy-dialog] [role="dialog"] {
+  animation: scaleIn 0.3s ease-out;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Button hover effects */
+[data-privy-dialog] button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+[data-privy-dialog] button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Add a subtle glow to the primary buttons */
+[data-privy-dialog] [data-privy-login-method] button {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-privy-dialog] [data-privy-login-method] button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+[data-privy-dialog] [data-privy-login-method] button:hover::after {
+  opacity: 1;
+  transform: scale(1.2);
+}
