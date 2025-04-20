@@ -97,48 +97,21 @@ body {
   }
 }
 
-/* Custom styling for Privy modal */
+/* Custom styling for Privy modal - basic styles only */
 [data-privy-dialog] {
-  animation: fadeIn 0.3s ease-out;
   backdrop-filter: blur(8px);
 }
 
 [data-privy-dialog] [role="dialog"] {
-  animation: scaleIn 0.3s ease-out;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
   border-radius: 16px !important;
   overflow: hidden;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Button hover effects */
-[data-privy-dialog] button {
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-}
-
+/* Basic button hover effects - the rest will be handled by JS */
 [data-privy-dialog] button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Add a subtle glow to the primary buttons */
@@ -162,4 +135,31 @@ body {
 [data-privy-dialog] [data-privy-login-method] button:hover::after {
   opacity: 1;
   transform: scale(1.2);
+}
+
+/* Add a subtle shimmer effect to the modal */
+[data-privy-dialog] [role="dialog"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
 }

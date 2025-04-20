@@ -33,8 +33,8 @@ export function PrivyLayout({ children }: { children: React.ReactNode }) {
     <PrivyProvider
       appId={privyAppId}
       config={privyConfig}
-      // onSuccess can be used for post-login actions if needed
-      // onSuccess={(user) => console.log(`User ${user.id} logged in!`)}
+      // Note: onSuccess is not a direct prop. Post-login actions
+      // should be handled by components using the usePrivy hook.
     >
       {children}
     </PrivyProvider>
