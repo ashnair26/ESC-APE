@@ -65,10 +65,11 @@ const StageCard: React.FC<StageCardProps> = ({
   return (
     <div
       className={clsx(
-        'relative overflow-hidden rounded-custom border-4 border-black dark:border-gray-700 shadow-lg',
+        'relative overflow-hidden rounded-custom border border-gray-200 dark:border-gray-700 dark:bg-[#181818] shadow-md',
         'w-full h-[574px] md:max-w-[1174px]',
         className
       )}
+      style={{ borderWidth: '0.5px' }}
     >
       {/* Background Image (full-bleed) */}
       <div className="absolute inset-0 w-full h-full">
@@ -87,12 +88,7 @@ const StageCard: React.FC<StageCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       </div>
 
-      {/* Stage number badge */}
-      <div className="absolute top-6 left-6 z-10">
-        <div className="flex items-center justify-center w-16 h-16 bg-black text-white rounded-full border-2 border-white">
-          <span className="text-2xl font-bold font-escape-heading">{stageNumber}</span>
-        </div>
-      </div>
+      {/* Stage number badge removed as requested */}
 
       {/* Content overlay */}
       <div className="absolute inset-x-0 bottom-0 z-10 p-8 text-white">
@@ -156,15 +152,15 @@ const StageCard: React.FC<StageCardProps> = ({
           <div className="rounded-full bg-black/50 p-8 backdrop-blur-sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-24 w-24 text-white/70"
+              className="h-24 w-24 text-white/50"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              strokeWidth="0.5"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={0.5}
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
