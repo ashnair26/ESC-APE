@@ -61,22 +61,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             console.error(`[API Route] MCP Server Response Data:`, error.response.data);
         } else if (error.request) {
             // The request was made but no response was received
-            console.error('[API Route] No response received from MCP server request.');
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error('[API Route] Error setting up request to MCP server:', error.message);
-        }
-
-        // Check if it's a connection error
-        if (error.code === 'ECONNREFUSED') {
-             return NextResponse.json(
-                { success: false, error: `Could not connect to ${serverName} server at ${serverUrl}. Is it running?` },
-                { status: 503 } // Service Unavailable
-            );
-        }
-        // Check for timeout
-        if (error.code === 'ECONNABORTED') {
-             return NextResponse.json(
                 { success: false, error: `Request to ${serverName} server timed out.` },
                 { status: 504 } // Gateway Timeout
             );
