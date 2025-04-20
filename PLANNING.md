@@ -374,6 +374,88 @@ sequenceDiagram
     Client->>User: Redirect to dashboard
 ```
 
+### 🔒 Admin Dashboard Authentication
+*Dedicated login system for platform administrators - separate from Privy*
+
+#### Overview
+The Admin Dashboard uses a completely separate authentication system from the Privy-based authentication used for regular users and creators. While regular users (community members and creators) authenticate via Privy, platform administrators access the admin dashboard through this dedicated system with enhanced security controls.
+
+This separation ensures that admin access remains independent from the Web3/social authentication mechanisms used by the platform's end users.
+
+#### Admin Users Schema
+```
+table: admin_user
+- id (serial, PK)
+- email (text, unique)
+- password_hash (text)  # bcrypt hashed passwords
+- role (text)
+- name (text)
+- last_login (timestampz)
+- created_at (timestampz)
+```
+
+#### Admin Sessions Schema
+```
+table: admin_sessions
+- id (serial, PK)
+- session_id (uuid, unique)
+- admin_id (integer, FK → admin_user.id)
+- created_at (timestamptz)
+- expires_at (timestamptz)
+- ip_address (text)
+- user_agent (text)
+```
+
+#### Implementation Details
+
+1. **Password Security**
+   - Passwords are hashed using bcrypt with appropriate cost factor
+   - Hashes are never exposed to the frontend
+   - Password complexity requirements enforced on signup/change
+
+2. **Authentication Process**
+   ```javascript
+   // Login flow
+   1. Admin submits email and password
+   2. Server retrieves admin by email from Supabase
+   3. Server compares password against stored hash using bcrypt
+   4. On success, generate unique session ID and store in admin_sessions
+   5. Create JWT with admin ID, email, role, and session ID
+   6. Set httpOnly secure cookie with JWT
+   7. Return success response with minimal admin details
+   ```
+
+3. **Session Management**
+   - Sessions tracked in database for immediate revocation capability
+   - Sessions include device info (IP, user agent) for audit purposes
+   - Sessions expire after configurable time period (default: 2 hours)
+
+4. **Route Protection**
+   - Protected routes use middleware to verify JWT
+   - Middleware also checks that session exists and is valid in database
+   - Role-based access ensures admins only access authorized routes
+
+5. **Security Measures**
+   - Rate limiting on login attempts (5 per 15-minute window)
+   - CSRF protection on all admin routes
+   - Consistent timing for failed logins to prevent timing attacks
+   - Secure, httpOnly, SameSite=strict cookies to prevent XSS
+
+#### Logout & Session Management
+```javascript
+// Logout flow
+1. Retrieve token from cookie and verify
+2. Delete session from admin_sessions table
+3. Clear the admin_token cookie
+4. Return success response
+```
+
+#### Integration with MCP
+The admin authentication system integrates with the project's MCP architecture:
+- Uses Supabase MCP server for data storage and retrieval
+- Admin session data is never exposed through public APIs
+- Secrets (JWT signing keys) managed through the secrets management system
+
 ---
 
 ## 🧩 Platform Modules
@@ -466,88 +548,6 @@ sequenceDiagram
    - Session management
    - Authentication data is synced to Supabase for persistence
 
-### 🔒 Admin Dashboard Authentication
-*Dedicated login system for platform administrators - separate from Privy*
-
-#### Overview
-The Admin Dashboard uses a completely separate authentication system from the Privy-based authentication used for regular users and creators. While regular users (community members and creators) authenticate via Privy, platform administrators access the admin dashboard through this dedicated system with enhanced security controls.
-
-This separation ensures that admin access remains independent from the Web3/social authentication mechanisms used by the platform's end users.
-
-#### Admin Users Schema
-```
-table: admin_user
-- id (serial, PK)
-- email (text, unique)
-- password_hash (text)  # bcrypt hashed passwords
-- role (text)
-- name (text)
-- last_login (timestampz)
-- created_at (timestampz)
-```
-
-#### Admin Sessions Schema
-```
-table: admin_sessions
-- id (serial, PK)
-- session_id (uuid, unique)
-- admin_id (integer, FK → admin_user.id)
-- created_at (timestampz)
-- expires_at (timestampz)
-- ip_address (text)
-- user_agent (text)
-```
-
-#### Implementation Details
-
-1. **Password Security**
-   - Passwords are hashed using bcrypt with appropriate cost factor
-   - Hashes are never exposed to the frontend
-   - Password complexity requirements enforced on signup/change
-
-2. **Authentication Process**
-   ```javascript
-   // Login flow
-   1. Admin submits email and password
-   2. Server retrieves admin by email from Supabase
-   3. Server compares password against stored hash using bcrypt
-   4. On success, generate unique session ID and store in admin_sessions
-   5. Create JWT with admin ID, email, role, and session ID
-   6. Set httpOnly secure cookie with JWT
-   7. Return success response with minimal admin details
-   ```
-
-3. **Session Management**
-   - Sessions tracked in database for immediate revocation capability
-   - Sessions include device info (IP, user agent) for audit purposes
-   - Sessions expire after configurable time period (default: 2 hours)
-
-4. **Route Protection**
-   - Protected routes use middleware to verify JWT
-   - Middleware also checks that session exists and is valid in database
-   - Role-based access ensures admins only access authorized routes
-
-5. **Security Measures**
-   - Rate limiting on login attempts (5 per 15-minute window)
-   - CSRF protection on all admin routes
-   - Consistent timing for failed logins to prevent timing attacks
-   - Secure, httpOnly, SameSite=strict cookies to prevent XSS
-
-#### Logout & Session Management
-```javascript
-// Logout flow
-1. Retrieve token from cookie and verify
-2. Delete session from admin_sessions table
-3. Clear the admin_token cookie
-4. Return success response
-```
-
-#### Integration with MCP
-The admin authentication system integrates with the project's MCP architecture:
-- Uses Supabase MCP server for data storage and retrieval
-- Admin session data is never exposed through public APIs
-- Secrets (JWT signing keys) managed through the secrets management system
-
 ### Authentication Flow
 
 1. User attempts to access gated content or feature
@@ -624,14 +624,6 @@ Each NFT can evolve through **up to 13 stages**, with each stage:
 * Optionally unlocking whitelist access or rewards
 
 Stages represent levels within a Creator's world (e.g., "Stage 1: The Catacombs", "Stage 2: The Ascension") that users progress through by engaging with the content and collecting Grails. Stages have their own visual identity in the dashboard (separate from NFT imagery), and users progress through these stages as they interact with the Creator's IP.
-
-### ⚙️ Creator Configuration (via Dashboard)
-Creators define the structure of their NFT evolution in the **Stage Configurator**:
-* Set total number of stages (up to 13)
-* Define Grail or Quest requirements for each stage
-* Set passwords (stored off-chain) that unlock a stage
-* Upload art assets per stage (e.g. via minting tool)
-* Set if and when a stage unlocks Whitelist eligibility
 
 ### ⚙️ Creator Configuration (via Dashboard)
 Creators define the structure of their NFT evolution in the **Stage Configurator**:
@@ -836,13 +828,13 @@ Defined in `tailwind.config.js` as CSS variables:
 theme: {
   extend: {
     colors: {
-      primary: 'var(--color-primary)',
-      secondary: 'var(--color-secondary)',
-      accent: 'var(--color-accent)',
-      error: 'var(--color-error)',
-      surface: '#F3F4F6',
-      background: '#FFFFFF',
-      dark: '#121212',
+      primary: ‘var(--color-primary)’,
+      secondary: ‘var(--color-secondary)’,
+      accent: ‘var(--color-accent)’,
+      error: ‘var(--color-error)’,
+      surface: ‘#F3F4F6’,
+      background: ‘#FFFFFF’,
+      dark: ‘#121212’,
     }
   }
 }
@@ -868,7 +860,7 @@ Themes update dynamically on onboarding with custom `[data-theme]` class selecto
 | **ARIA Labels** | All interactive elements use `aria-label`, `aria-expanded`, etc. |
 | **Focus Rings** | Keyboard navigation highlights focused elements (tailwind: `focus:outline-*`) |
 | **Color Contrast** | All text meets WCAG 2.1 AA contrast ratios |
-| **Skip Links** | "Skip to content" nav support for screen readers |
+| **Skip Links** | “Skip to content” nav support for screen readers |
 | **Motion Reduction** | Respects `prefers-reduced-motion` setting |
 
 ### 📱 Mobile Responsiveness
@@ -884,61 +876,14 @@ Themes update dynamically on onboarding with custom `[data-theme]` class selecto
 
 ---
 
-## 👨‍💻 Development Guidelines
-
-### 🔄 Project Awareness & Context
-- **Always read `PLANNING.md`** at the start of a new conversation to understand the project's architecture, goals, style, and constraints.
-- **Check `TASK.md`** before starting a new task. If the task isn't listed, add it with a brief description and today's date.
-- **Use consistent naming conventions, file structure, and architecture patterns** as described in `PLANNING.md`.
-
-### 🧱 Code Structure & Modularity
-- **Never create a file longer than 500 lines of code.** If a file approaches this limit, refactor by splitting it into modules or helper files.
-- **Organize code into clearly separated modules**, grouped by feature or responsibility.
-- **Use clear, consistent imports** (prefer relative imports within packages).
-
-### 🧪 Testing & Reliability
-- **Always create Pytest unit tests for new features** (functions, classes, routes, etc).
-- **After updating any logic**, check whether existing unit tests need to be updated. If so, do it.
-- **Tests should live in a `/tests` folder** mirroring the main app structure.
-  - Include at least:
-    - 1 test for expected use
-    - 1 edge case
-    - 1 failure case
-
-### ✅ Task Completion
-- **Mark completed tasks in `TASK.md`** immediately after finishing them.
-- Add new sub-tasks or TODOs discovered during development to `TASK.md` under a "Discovered During Work" section.
-
-### 📎 Style & Conventions
-- **Use Python** as the primary language.
-- **Follow PEP8**, use type hints, and format with `black`.
-- **Use `pydantic` for data validation**.
-- Use `FastAPI` for APIs and `SQLAlchemy` or `SQLModel` for ORM if applicable.
-- Write **docstrings for every function** using the Google style:
-  ```python
-  def example():
-      """
-      Brief summary.
-      Args:
-          param1 (type): Description.
-      Returns:
-          type: Description.
-      """
-  ```
-
-### 📚 Documentation & Explainability
-- **Update `README.md`** when new features are added, dependencies change, or setup steps are modified.
-- **Comment non-obvious code** and ensure everything is understandable to a mid-level developer.
-- When writing complex logic, **add an inline `# Reason:` comment** explaining the why, not just the what.
-
-### 🧠 AI Behavior Rules
+## 🧠 AI Behavior Rules
 - **Never assume missing context. Ask questions if uncertain.**
 - **Never hallucinate libraries or functions** – only use known, verified Python packages.
 - **Always confirm file paths and module names** exist before referencing them in code or tests.
 - **Never delete or overwrite existing code** unless explicitly instructed to or if part of a task from `TASK.md`.
 - **Generate new files instead of modifying existing ones** when adding substantial new functionality.
 - **Document planned changes before implementation** for review and approval.
-- **Respect the "Protected Files" list** in the section below for files that should never be modified automatically.
+- **Respect the “Protected Files” list** in the section below for files that should never be modified automatically.
 
 ### 🔒 AI Code Generation Safeguards
 *Guidelines for preventing problematic AI code modifications*
@@ -968,7 +913,7 @@ frontend/src/lib/auth/supabase-sync.ts
    - AI proposes changes in natural language first
    - Human approves specific file changes
    - AI generates code in new or approved files only
-   - Automated tests validate changes don't break functionality
+   - Automated tests validate changes don’t break functionality
 
 2. **Incremental Approach**
    - Generate one component/function at a time
@@ -989,7 +934,7 @@ frontend/src/lib/auth/supabase-sync.ts
 ```python
 # Example pattern for preventing accidental overrides
 def update_file(file_path, new_content):
-    """Update file with new content, with safeguards.
+    “””Update file with new content, with safeguards.
     
     Args:
         file_path: Path to the file to update
@@ -997,11 +942,11 @@ def update_file(file_path, new_content):
     
     Returns:
         bool: Success or failure
-    """
+    “””
     # Check if file is protected
     PROTECTED_FILES = load_protected_files_list()
     if file_path in PROTECTED_FILES:
-        logging.warning(f"Attempted modification of protected file: {file_path}")
+        logging.warning(f”Attempted modification of protected file: {file_path}”)
         return False
     
     # Always create backup before modifying
@@ -1009,10 +954,10 @@ def update_file(file_path, new_content):
     
     # Only proceed if file exists (no creating new core files)
     if not os.path.exists(file_path):
-        logging.warning(f"Attempted to modify non-existent file: {file_path}")
+        logging.warning(f”Attempted to modify non-existent file: {file_path}”)
         return False
     
-    with open(file_path, 'w') as f:
+    with open(file_path, ‘w’) as f:
         f.write(new_content)
     
     return True
@@ -1035,126 +980,6 @@ In case of problematic AI-generated code:
    - Add problematic file to Protected Files list
    - Create a template for the affected component type
    - Break task into smaller, isolated changes
-- **Generate new files instead of modifying existing ones** when adding substantial new functionality.
-- **Document planned changes before implementation** for review and approval.
-- **Respect the "Protected Files" list** in the section below for files that should never be modified automatically.
-
-### 🔒 AI Code Generation Safeguards
-*Guidelines for preventing problematic AI code modifications*
-
-> **IMPORTANT INSTRUCTION**: All AI assistants (including Augment Code) MUST read this entire planning document at the beginning of EACH new conversation or session. AI tools must adhere to these guidelines without exception and should reference this document regularly during development to ensure compliance.
-
-#### Protected Files
-The following files should NEVER be modified automatically by AI tools:
-```
-# Core system files (never modify)
-core/auth/privy_client.py
-core/config.py
-core/db/supabase_client.py
-core/secrets.py
-
-# Stable API implementations
-api/routes/auth.py
-api/routes/users.py
-
-# Frontend core components
-frontend/src/providers/auth-provider.tsx
-frontend/src/lib/auth/supabase-sync.ts
-```
-
-#### Code Generation Workflow
-1. **Plan → Review → Generate → Validate**
-   - AI proposes changes in natural language first
-   - Human approves specific file changes
-   - AI generates code in new or approved files only
-   - Automated tests validate changes don't break functionality
-
-2. **Incremental Approach**
-   - Generate one component/function at a time
-   - Integrate and test before moving to the next component
-   - Commit working code frequently
-
-3. **Explicit File Operations**
-   - Use markers like `// code-gen: create file path/to/new-file.ts`
-   - Never use markers to modify existing files
-   - Generate complete files rather than partial updates
-
-#### Version Control Integration
-- Commit before any significant AI-guided changes
-- Use feature branches for experimental changes
-- Include commit message indicating AI-assisted work
-
-#### Implementation Guards
-```python
-# Example pattern for preventing accidental overrides
-def update_file(file_path, new_content):
-    """Update file with new content, with safeguards.
-    
-    Args:
-        file_path: Path to the file to update
-        new_content: New file content
-    
-    Returns:
-        bool: Success or failure
-    """
-    # Check if file is protected
-    PROTECTED_FILES = load_protected_files_list()
-    if file_path in PROTECTED_FILES:
-        logging.warning(f"Attempted modification of protected file: {file_path}")
-        return False
-    
-    # Always create backup before modifying
-    create_backup(file_path)
-    
-    # Only proceed if file exists (no creating new core files)
-    if not os.path.exists(file_path):
-        logging.warning(f"Attempted to modify non-existent file: {file_path}")
-        return False
-    
-    with open(file_path, 'w') as f:
-        f.write(new_content)
-    
-    return True
-```
-
-#### Recovery Procedures
-In case of problematic AI-generated code:
-
-1. **Immediate Fixes**
-   - Revert to last known good commit
-   - Use backups from `core/backups` directory
-   - Run `scripts/recovery.py` to restore system state
-
-2. **Root Cause Diagnosis**
-   - Check `logs/ai_operations.log` for AI actions
-   - Analyze which instructions led to problematic behavior
-   - Update planning.md with additional safeguards
-
-3. **Prevention Tactics**
-   - Add problematic file to Protected Files list
-   - Create a template for the affected component type
-   - Break task into smaller, isolated changes
-
-### 📦 Component Guidelines
-**Buttons**
-* Use `<button>` with `type="button|submit"`
-* Support loading and disabled states
-* All actions must be keyboard-accessible
-
-**Inputs**
-* Use `<label for="inputId">` linked to input
-* Include helper/error text, icons optional
-* Use `aria-invalid="true"` when input has errors
-
-**Cards & Panels**
-* Include headings with `role="heading"` or `<h2>`+
-* Use logical z-index layering (e.g., panel overlays)
-* Interactive panels in Comic Reader support keyboard focus & clicks
-
-### 🧪 Testing Tools
-* Lighthouse (Chrome DevTools)
-* axe-core (Accessibility linting)
-* Screen reader testing (NVDA, VoiceOver)
 
 ---
 
@@ -1163,7 +988,7 @@ In case of problematic AI-generated code:
 
 This document outlines the core tables, fields, and relationships used by the ESCAPE Creator Engine to manage users, quests, grails, lore submissions, NFT stage tracking, proof systems, and affiliate programs.
 
-**Implementation Note:** Supabase Model Context Protocol (MCP) must be used when implementing and managing this database schema. Creators never interact directly with the database - all operations are abstracted through the platform's admin interfaces.
+**Implementation Note:** Supabase Model Context Protocol (MCP) must be used when implementing and managing this database schema. Creators never interact directly with the database - all operations are abstracted through the platform’s admin interfaces.
 
 ### 🧑 Users
 Stores basic user data, social handles, and XP.
@@ -1210,7 +1035,7 @@ table: grails
 
 These Grails serve multiple purposes in the ecosystem:
 1. Act as collectibles that verify user engagement with content
-2. Provide opportunities for users to contribute to the story's lore
+2. Provide opportunities for users to contribute to the story’s lore
 3. Function as keys that unlock passwords needed for stage progression
 4. Enable community participation through voting on submitted lore
 5. Drive the NFT evolution process through collection requirements
@@ -1259,7 +1084,7 @@ table: public_canon_lore
 - created_at (timestampz)
 ```
 
-The Hall of Memories (or Creator's chosen name for this archive) showcases the community-selected lore that becomes official "canon" within the Creator's IP world. This creates a collaborative storytelling experience where users directly contribute to the evolving narrative.
+The Hall of Memories (or Creator’s chosen name for this archive) showcases the community-selected lore that becomes official “canon” within the Creator’s IP world. This creates a collaborative storytelling experience where users directly contribute to the evolving narrative.
 
 ### 🧭 Quests
 Houses all daily, project, and lore quests.
@@ -1349,7 +1174,7 @@ These tables allow creators to:
 
 This document defines the Sanity content structure for comic pages, panels, grails, and lore metadata within the ESCAPE Creator Engine.
 
-**Implementation Note:** All Sanity CMS structures are managed through the platform's creator interfaces. Creators work with visual editors rather than directly with the schema.
+**Implementation Note:** All Sanity CMS structures are managed through the platform’s creator interfaces. Creators work with visual editors rather than directly with the schema.
 
 ### 📚 Comic Page (or Full Page Mode)
 For comics where the full page is the unit of interaction.
@@ -1436,7 +1261,7 @@ This document outlines how Farcaster and X (Twitter) are integrated into the ESC
 * Display Farcaster avatar, name, and FID
 * Cast events (e.g. page release, quest complete)
 * Manual cast by user or automated by system
-* View private feed within creator's community page
+* View private feed within creator’s community page
 * Button to message users (external redirect)
 
 ### 🧠 Cast Triggers (Auto or Manual)
@@ -1467,7 +1292,7 @@ Each trigger can:
 * User can edit tweet before posting
 
 ### 🧵 Example Shared Tweet
-"Chapter 3, Page 12 of #EscapeKim just dropped. Find the hidden Grail. 🕵️‍♀️ https://escape.xyz/read"
+“Chapter 3, Page 12 of #EscapeKim just dropped. Find the hidden Grail. 🕵️‍♀️ https://escape.xyz/read”
 
 ### 🔗 Share Logic
 * Each castable element (comic, quest, lore) has a Share button
@@ -1477,19 +1302,19 @@ Each trigger can:
 ### 🧩 Example React Component — Share Button
 
 ```
-import { Button } from "@/components/ui/button";
-import { Twitter } from "lucide-react";
+import { Button } from “@/components/ui/button”;
+import { Twitter } from “lucide-react”;
 
 export function ShareOnXButton({ contentText, url }) {
   const handleClick = () => {
     const tweetText = encodeURIComponent(`${contentText}\n\n${url}`);
     const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
-    window.open(twitterUrl, "_blank");
+    window.open(twitterUrl, “_blank”);
   };
 
   return (
-    <Button onClick={handleClick} variant="outline" className="flex gap-2">
-      <Twitter className="h-4 w-4" /> Share on X
+    <Button onClick={handleClick} variant=“outline” className=“flex gap-2”>
+      <Twitter className=“h-4 w-4” /> Share on X
     </Button>
   );
 }
@@ -1521,7 +1346,7 @@ The centerpiece of the tracking system is a dedicated Progress Card on the user 
 |---------|----------------|
 | Visual Journey Map | Interactive visualization of all stages with clear status indicators |
 | Progress Metrics | Real-time counters for Grails found, XP earned, quests completed |
-| Next Steps | Actionable guidance based on user's current status |
+| Next Steps | Actionable guidance based on user’s current status |
 | Milestone Previews | Partial reveals of upcoming content to drive engagement |
 | Smart Hints | Context-aware clues that help users overcome obstacles |
 
@@ -1566,9 +1391,21 @@ The Progress Card maintains consistent UI patterns:
 
 * Always accessible via a dedicated dashboard card
 * Expandable to show detailed view of entire journey
-* Color-coded to match Creator's theme settings
+* Color-coded to match Creator’s theme settings
 * Responsive design adapts to all device sizes
 * Animations celebrate milestone completions
+
+### 🎮 User Experience Flow
+
+1. **Orientation**: New users see simplified version highlighting immediate next steps
+2. **Engagement**: As users progress, more of the journey map is revealed
+3. **Guidance**: When stuck, contextual hints appear with increasing specificity
+4. **Celebration**: Milestone completions trigger visual rewards and animations
+5. **Preview**: Next stage teasers create anticipation for continued engagement
+
+The Progress Tracking System transforms complex progression mechanisms into an intuitive, game-like experience that keeps users engaged while helping them navigate the Creator’s unique community journey.
+
+---
 
 ## 🛠️ Project Maintenance & Stability Guidelines
 *Best practices for maintaining code quality and preventing regressions*
@@ -1620,50 +1457,200 @@ The Progress Card maintains consistent UI patterns:
 
 ---
 
-## 🛠️ Project Maintenance & Stability Guidelines
-*Best practices for maintaining code quality and preventing regressions*
+## 🏗️ Implementation Blueprint
+*Concrete implementation details for development*
 
-### 📋 Development Workflow
+This section builds on the conceptual architecture to provide specific file structure, routing logic, and implementation details for developers.
 
-#### Code Contribution Process
-1. **Task Selection**: Choose a task from TASK.md
-2. **Branch Creation**: Create a feature branch from main
-3. **Implementation**: Write code following the guidelines
-4. **Testing**: Write and run tests for new functionality
-5. **Review**: Request code review from team members
-6. **Merge**: Merge changes to main after approval
-7. **Update**: Update TASK.md to mark task as complete
+### 📁 Folder & File Structure
 
-#### Change Management
-* Document all significant changes in CHANGELOG.md
-* Tag releases using semantic versioning (MAJOR.MINOR.PATCH)
-* Include migration scripts for database schema changes
+```
+/web
+  /app
+    layout.tsx
+    page.tsx
+    /login
+      page.tsx
+    /auth-check
+      page.tsx
+    /onboarding
+      welcome.tsx
+      select-template.tsx
+      customize.tsx
+      finish.tsx
+    /creator-dashboard
+      page.tsx
+  /components
+    /BentoGrid
+      BentoGrid.tsx
+      BentoItem.tsx
+    /Button
+      Button.tsx
+    /Input
+      Input.tsx
+    Providers.tsx
+  /lib
+    supabaseClient.ts
+    usePrivyAuth.ts
+  /styles
+    tailwind.config.js
+/docs
+  planning.md
+  CODEGUIDE.md
+  task.md
+  README.md
+```
 
-### 🔍 Quality Assurance
+### 🔄 Auth-Check Routing Logic
 
-#### Testing Strategy
-* **Unit Tests**: Test individual functions and components
-* **Integration Tests**: Test interactions between subsystems
-* **End-to-End Tests**: Test complete user journeys
-* **Manual Testing**: Verify visual elements and user experience
-* **Performance Testing**: Ensure system performs under load
+The `/auth-check/page.tsx` file implements the logic to route users after Privy login:
 
-#### Monitoring & Error Tracking
-* Implement logging throughout the application
-* Set up error tracking system (e.g., Sentry)
-* Monitor system health metrics (e.g., API response times)
-* Create dashboards for key performance indicators
+```typescript
+useEffect(() => {
+  if (!ready || !authenticated) return;
 
-### 📚 Documentation Requirements
+  const u = user;
+  // 1. Upsert into `users`
+  await supabase.from(‘users’).upsert({
+    id: u.walletAddress || u.email,
+    display_name: u.name,
+    email: u.email,
+    wallet: u.walletAddress,
+  });
 
-#### Code Documentation
-* Document all functions with docstrings
-* Include usage examples for complex functions
-* Document component props and state management
-* Explain architectural decisions in comments
+  // 2. Check Creator
+  const { data: creators } = await supabase.from(‘creators’)
+    .select(‘community_id’)
+    .eq(‘user_id’, userId);
+  if (creators.length) return router.push(‘/creator-dashboard’);
 
-#### User Documentation
-* Create detailed guides for creators and community members
-* Include troubleshooting sections for common issues
-* Provide video tutorials for key workflows
-* Update documentation with each release
+  // 3. Check Member
+  const { data: members } = await supabase.from(‘community_members’)
+    .select(‘community:communities(slug)’)
+    .eq(‘user_id’, userId)
+    .limit(1);
+  if (members.length) return router.push(`/community/${members[0].community.slug}`);
+
+  // 4. New user
+  router.push(‘/onboarding/welcome’);
+}, [ready, authenticated]);
+```
+
+### 🔍 Onboarding Flow Screens
+
+| Route | Purpose |
+|-------|---------|
+| `/login` | Privy login modal |
+| `/auth-check` | Post-login routing logic |
+| `/onboarding/welcome` | “Create or Join?” CTA |
+| `/onboarding/select-template` | Choose prebuilt community template |
+| `/onboarding/customize` | Custom: name, slug, theme, modules |
+| `/onboarding/finish` | Review & Launch community |
+| `/creator-dashboard` | Creator’s control panel |
+| `/community/[slug]` | Public/community member view |
+
+### 🗃️ Database Schema Additions
+
+#### community_templates Table
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid (PK) | Template identifier |
+| name | text | e.g. “Lore-Focused”, “NFT Club” |
+| layout_config | jsonb | Bento grid layout definition |
+| modules_enabled | text[] | [“quests”,”nfts”,”lore”] |
+| theme_tokens | jsonb | { primary, secondary, accent, error } |
+| created_at | timestamptz | Timestamp |
+
+#### users Table Additions
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| has_onboarded | boolean | Completed onboarding? |
+| default_community_id | uuid (FK) | Quick redirect target after login |
+| display_name | text | Friendly name (from Google/Twitter) |
+| profile_pic | text | Avatar URL |
+
+### 📊 Bento Grid Implementation
+
+The BentoGrid component provides a flexible layout system:
+
+```tsx
+<BentoGrid columns={6} gap={4} rowHeight={100}>
+  <BentoItem colSpan={3} rowSpan={2}><ChartCard /></BentoItem>
+  <BentoItem colSpan={2} rowSpan={3}><Activity /></BentoItem>
+</BentoGrid>
+```
+
+**Props**:
+- **BentoGrid**: columns, gap, rowHeight
+- **BentoItem**: colSpan, rowSpan
+- **Responsive**: Use Tailwind md:, lg: prefixes
+
+### 🎨 Styling Implementation
+
+The styling system uses CSS variables defined in `tailwind.config.js`:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: ‘var(--color-primary)’,
+        secondary: ‘var(--color-secondary)’,
+        accent: ‘var(--color-accent)’,
+        error: ‘var(--color-error)’,
+      },
+      fontSize: {
+        ‘2xl’: ‘1.5rem’,
+        ‘3xl’: ‘1.875rem’,
+      },
+      spacing: {
+        4: ‘1rem’, 8: ‘2rem’, 16: ‘4rem’,
+      },
+    },
+  }
+};
+```
+
+CSS variables set in `:root`:
+
+```css
+:root {
+  --color-primary: #4F46E5;
+  --color-secondary: #22D3EE;
+  --color-accent: #FBBF24;
+  --color-error: #EF4444;
+}
+```
+
+### 🔬 Testing Matrix
+
+| Flow | Unit Test | Integration Test | E2E Test |
+|------|-----------|-----------------|----------|
+| Auth-Check Redirects | Test redirect logic fn | Router integration | Simulate login → verify URL |
+| Onboarding Wizard | Validate step component blocks | State machine transitions | Complete all steps → final page |
+| Quest Completion API | Validate reward calc fn | Supabase RPC & policies | Simulate quest run & completion |
+| NFT Evolution Trigger | Validate unlock logic | Metadata row updates | Mint via HeyMint widget |
+
+### 🚀 CI/CD & Deployment
+
+**Development Commands**:
+```bash
+# Local Dev
+npm run dev
+supabase db push
+
+# Build
+npm run build
+
+# Deploy
+# Frontend via Fleek (auto from GitHub)
+# Supabase migrations via CI script
+```
+
+**Fleek Settings**:
+- Repo: GitHub ESC/APE main branch
+- Build Command: npm run build
+- Publish Directory: .next
+- Environment: set NEXT_PUBLIC_PRIVY_APP_ID, etc.
