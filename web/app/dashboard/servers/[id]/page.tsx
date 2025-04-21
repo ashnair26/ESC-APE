@@ -12,6 +12,11 @@ interface Tool {
   parameters: any;
 }
 
+interface ServerType {
+  value: string;
+  label: string;
+}
+
 export default function ServerDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -23,6 +28,13 @@ export default function ServerDetailPage() {
   const [serverDescription, setServerDescription] = useState('');
   const [serverStatus, setServerStatus] = useState<'online' | 'offline'>('offline');
   const [serverUrl, setServerUrl] = useState('');
+  const [serverType, setServerType] = useState<string>('sse');
+
+  // Server type options
+  const serverTypeOptions: ServerType[] = [
+    { value: 'sse', label: 'SSE' },
+    { value: 'command', label: 'Command' }
+  ];
 
   // Helper function to get server URL
   const getServerUrl = (id: string): string => {
@@ -228,6 +240,24 @@ export default function ServerDetailPage() {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">
                       {tools.length}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      Server Type
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      <select
+                        value={serverType}
+                        onChange={(e) => setServerType(e.target.value)}
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm"
+                      >
+                        {serverTypeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                     </dd>
                   </div>
                 </dl>
