@@ -26,15 +26,36 @@ MCP_SERVERS = {
         "name": "Unified MCP",
         "port": 8000,
         "tools": [
+            # Supabase tools
             {"name": "supabase_read", "description": "Read data from Supabase"},
             {"name": "supabase_write", "description": "Write data to Supabase"},
+            {"name": "supabase_query", "description": "Execute a SQL query on Supabase"},
+            {"name": "supabase_auth", "description": "Authenticate with Supabase"},
+
+            # Git tools
             {"name": "git_clone", "description": "Clone a Git repository"},
             {"name": "git_commit", "description": "Commit changes to a Git repository"},
+            {"name": "git_push", "description": "Push changes to a Git repository"},
+            {"name": "git_pull", "description": "Pull changes from a Git repository"},
+
+            # Sanity tools
             {"name": "sanity_fetch", "description": "Fetch content from Sanity CMS"},
+            {"name": "sanity_create", "description": "Create content in Sanity CMS"},
+            {"name": "sanity_update", "description": "Update content in Sanity CMS"},
+
+            # Privy tools
             {"name": "privy_auth", "description": "Authenticate with Privy"},
+            {"name": "privy_user", "description": "Get user information from Privy"},
+
+            # BASE tools
             {"name": "base_mint", "description": "Mint an NFT on BASE blockchain"},
+            {"name": "base_transfer", "description": "Transfer an NFT on BASE blockchain"},
+
+            # Context7 tools
             {"name": "context7_resolve_library_id", "description": "Resolves a general library name into a Context7-compatible library ID"},
             {"name": "context7_get_library_docs", "description": "Fetches documentation for a library using a Context7-compatible library ID"},
+
+            # Figma tools
             {"name": "figma_get_file", "description": "Retrieves a Figma file by its key"},
             {"name": "figma_get_components", "description": "Retrieves components from a Figma file"},
             {"name": "figma_get_styles", "description": "Retrieves styles from a Figma file"}

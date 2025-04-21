@@ -8,9 +8,11 @@ to connect to each one separately.
 """
 
 import os
-from typing import List, Optional
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any, Callable, Awaitable
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 
 # Import all the individual MCP servers
 from servers.supabase.server import mcp as supabase_mcp
@@ -18,8 +20,16 @@ from servers.git.server import mcp as git_mcp
 from servers.sanity.server import mcp as sanity_mcp
 from servers.privy.server import mcp as privy_mcp
 from servers.base.server import mcp as base_mcp
-from servers.context7.server import app as context7_app
-from servers.figma.server import app as figma_app
+
+# Import the FastAPI adapters
+from servers.unified.adapters import Context7Adapter, FigmaAdapter
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("unified-mcp")
 
 # Import authentication utilities
 from core.auth import setup_auth_middleware
@@ -36,54 +46,84 @@ setup_auth_middleware(
     skip_auth=skip_auth
 )
 
+# Initialize the FastAPI adapters
+context7_adapter = Context7Adapter()
+figma_adapter = FigmaAdapter()
 
-# Adapter functions for FastAPI-based MCP servers
-async def context7_resolve_library_id(libraryName: str = None) -> dict:
+# Dictionary to store the adapters
+adapters = {
+    "context7": context7_adapter,
+    "figma": figma_adapter
+}
+
+
+# Adapter functions for Context7 MCP server
+async def context7_resolve_library_id(ctx: Context, libraryName: str = None) -> dict:
     """Resolves a general library name into a Context7-compatible library ID."""
-    # This would normally make an HTTP request to the Context7 server
-    # For simplicity, we'll just return a mock response
-    return {"libraryId": f"{libraryName or 'react'}@latest"}
+    try:
+        return await context7_adapter.resolve_library_id(libraryName)
+    except Exception as e:
+        logger.error(f"Error resolving library ID: {e}")
+        return {"error": str(e)}
 
 
-async def context7_get_library_docs(context7CompatibleLibraryID: str, topic: str = None, tokens: int = 5000) -> dict:
+async def context7_get_library_docs(ctx: Context, context7CompatibleLibraryID: str, topic: str = None, tokens: int = 5000) -> dict:
     """Fetches documentation for a library using a Context7-compatible library ID."""
-    # This would normally make an HTTP request to the Context7 server
-    # For simplicity, we'll just return a mock response
-    return {"documentation": f"Documentation for {context7CompatibleLibraryID}"}
+    try:
+        return await context7_adapter.get_library_docs(context7CompatibleLibraryID, topic, tokens)
+    except Exception as e:
+        logger.error(f"Error getting library docs: {e}")
+        return {"error": str(e)}
 
 
-async def figma_get_file(fileKey: str, accessToken: str = None) -> dict:
+# Adapter functions for Figma MCP server
+async def figma_get_file(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves a Figma file by its key."""
-    # This would normally make an HTTP request to the Figma server
-    # For simplicity, we'll just return a mock response
-    return {
-        "document": {"id": "0:0", "name": "Document"},
-        "name": f"Figma file: {fileKey}"
-    }
+    try:
+        return await figma_adapter.get_file(fileKey, accessToken)
+    except Exception as e:
+        logger.error(f"Error getting Figma file: {e}")
+        return {"error": str(e)}
 
 
-async def figma_get_components(fileKey: str, accessToken: str = None) -> dict:
+async def figma_get_components(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves components from a Figma file."""
-    # This would normally make an HTTP request to the Figma server
-    # For simplicity, we'll just return a mock response
-    return {
-        "components": [
-            {"id": "1:0", "name": "Button"},
-            {"id": "1:1", "name": "Card"}
-        ]
-    }
+    try:
+        return await figma_adapter.get_components(fileKey, accessToken)
+    except Exception as e:
+        logger.error(f"Error getting Figma components: {e}")
+        return {"error": str(e)}
 
 
-async def figma_get_styles(fileKey: str, accessToken: str = None) -> dict:
+async def figma_get_styles(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves styles from a Figma file."""
-    # This would normally make an HTTP request to the Figma server
-    # For simplicity, we'll just return a mock response
-    return {
-        "styles": [
-            {"id": "S:1", "name": "Primary"},
-            {"id": "S:2", "name": "Secondary"}
-        ]
-    }
+    try:
+        return await figma_adapter.get_styles(fileKey, accessToken)
+    except Exception as e:
+        logger.error(f"Error getting Figma styles: {e}")
+        return {"error": str(e)}
+
+
+# Function to initialize the adapters
+async def initialize_adapters():
+    """Initialize all the adapters."""
+    for name, adapter in adapters.items():
+        try:
+            await adapter.initialize()
+            logger.info(f"Initialized {name} adapter")
+        except Exception as e:
+            logger.error(f"Error initializing {adapter.server_name} adapter: {e}")
+
+
+# Function to close the adapters
+async def close_adapters():
+    """Close all the adapters."""
+    for name, adapter in adapters.items():
+        try:
+            await adapter.close()
+            logger.info(f"Closed {name} adapter")
+        except Exception as e:
+            logger.error(f"Error closing {adapter.server_name} adapter: {e}")
 
 
 def import_tools_from_server(source_mcp: FastMCP) -> List:
@@ -133,6 +173,13 @@ def register_tools_from_server(source_mcp: FastMCP, prefix: Optional[str] = None
         )
 
 
+# Register tools from FastMCP-based servers
+register_tools_from_server(supabase_mcp, prefix="supabase")
+register_tools_from_server(git_mcp, prefix="git")
+register_tools_from_server(sanity_mcp, prefix="sanity")
+register_tools_from_server(privy_mcp, prefix="privy")
+register_tools_from_server(base_mcp, prefix="base")
+
 # Register Context7 tools
 mcp.register_tool(
     name="context7_resolve_library_id",
@@ -164,3 +211,32 @@ mcp.register_tool(
     func=figma_get_styles,
     description="Retrieves styles from a Figma file"
 )
+
+
+# Add lifecycle hooks
+@mcp.on_startup
+async def startup():
+    """Initialize the adapters when the server starts."""
+    logger.info("Initializing adapters...")
+    await initialize_adapters()
+    logger.info("Adapters initialized")
+
+
+@mcp.on_shutdown
+async def shutdown():
+    """Close the adapters when the server shuts down."""
+    logger.info("Closing adapters...")
+    await close_adapters()
+    logger.info("Adapters closed")
+
+
+# Add a main function to run the server
+if __name__ == "__main__":
+    import uvicorn
+    import asyncio
+
+    # Initialize the adapters
+    asyncio.run(initialize_adapters())
+
+    # Run the server
+    mcp.run_stdio()
