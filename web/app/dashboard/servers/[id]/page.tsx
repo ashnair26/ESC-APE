@@ -32,7 +32,8 @@ export default function ServerDetailPage() {
       privy: 8005,
       supabase: 8006,
       sanity: 8007,
-      base: 8008
+      base: 8008,
+      context7: 8009
     };
 
     const port = serverPorts[id];
@@ -47,7 +48,8 @@ export default function ServerDetailPage() {
       privy: 'Privy MCP',
       supabase: 'Supabase MCP',
       sanity: 'Sanity CMS',
-      base: 'BASE MCP'
+      base: 'BASE MCP',
+      context7: 'Context7 MCP'
     };
 
     return serverNames[id] || id.charAt(0).toUpperCase() + id.slice(1);
@@ -61,7 +63,8 @@ export default function ServerDetailPage() {
       privy: 'Privy authentication integration server',
       supabase: 'Supabase database integration server',
       sanity: 'Sanity CMS integration server',
-      base: 'BASE blockchain integration server'
+      base: 'BASE blockchain integration server',
+      context7: 'Up-to-date documentation for LLMs and AI code editors'
     };
 
     return serverDescriptions[id] || '';

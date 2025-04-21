@@ -10,6 +10,7 @@ const MCP_SERVERS: Record<string, string> = {
     supabase: 'http://localhost:8006',
     sanity: 'http://localhost:8007',
     base: 'http://localhost:8008',
+    context7: 'http://localhost:8009',
 };
 
 export async function GET(request: NextRequest) {

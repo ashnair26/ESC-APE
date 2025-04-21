@@ -84,6 +84,17 @@ const realServers: Server[] = [
     tools: 0,
     lastPingTimestamp: null,
     lastPing: 'Never'
+  },
+  {
+    id: 'context7',
+    name: 'Context7 MCP',
+    description: 'Up-to-date documentation for LLMs and AI code editors',
+    status: 'checking',
+    url: 'http://localhost:8009',
+    type: 'context7',
+    tools: 0,
+    lastPingTimestamp: null,
+    lastPing: 'Never'
   }
 ];
 

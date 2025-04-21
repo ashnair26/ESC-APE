@@ -96,6 +96,11 @@ ESCAPE/
 │   │   ├── server.py         # Main server implementation
 │   │   ├── client.py         # Sanity client implementation
 │   │   └── tests/            # Tests for the Sanity server
+│   ├── context7/             # Context7 MCP server
+│   │   ├── __init__.py
+│   │   ├── server.py         # Main server implementation
+│   │   ├── client.py         # Context7 client implementation
+│   │   └── tests/            # Tests for the Context7 server
 │   └── ...                   # Other servers
 ├── core/                     # Shared core functionality
 │   ├── __init__.py
@@ -187,6 +192,9 @@ ESCAPE/
 #### Phase 2: Additional Servers
 
 - Implement additional MCP servers for other services
+  - Context7 MCP server for up-to-date documentation for LLMs and AI code editors
+  - Privy MCP server for authentication
+  - BASE MCP server for blockchain integration
 - Create integration examples
 - Improve documentation
 
@@ -304,12 +312,12 @@ export async function supabaseSync(privyUser) {
     display_name: privyUser.name || null,
     avatar_url: privyUser.avatar || null
   });
-  
+
   if (error) {
     console.error('Failed to sync user with Supabase:', error);
     return false;
   }
-  
+
   return data;
 }
 ```
@@ -358,7 +366,7 @@ sequenceDiagram
     participant Privy as Privy SDK
     participant API as ESCAPE API
     participant Supabase
-    
+
     User->>Client: Clicks Login
     Client->>Privy: Open auth modal
     User->>Privy: Select login method
@@ -935,11 +943,11 @@ frontend/src/lib/auth/supabase-sync.ts
 # Example pattern for preventing accidental overrides
 def update_file(file_path, new_content):
     “””Update file with new content, with safeguards.
-    
+
     Args:
         file_path: Path to the file to update
         new_content: New file content
-    
+
     Returns:
         bool: Success or failure
     “””
@@ -948,18 +956,18 @@ def update_file(file_path, new_content):
     if file_path in PROTECTED_FILES:
         logging.warning(f”Attempted modification of protected file: {file_path}”)
         return False
-    
+
     # Always create backup before modifying
     create_backup(file_path)
-    
+
     # Only proceed if file exists (no creating new core files)
     if not os.path.exists(file_path):
         logging.warning(f”Attempted to modify non-existent file: {file_path}”)
         return False
-    
+
     with open(file_path, ‘w’) as f:
         f.write(new_content)
-    
+
     return True
 ```
 

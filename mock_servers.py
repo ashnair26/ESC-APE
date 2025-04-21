@@ -32,7 +32,8 @@ MCP_SERVERS = {
             {"name": "git_commit", "description": "Commit changes to a Git repository"},
             {"name": "sanity_fetch", "description": "Fetch content from Sanity CMS"},
             {"name": "privy_auth", "description": "Authenticate with Privy"},
-            {"name": "base_mint", "description": "Mint an NFT on BASE blockchain"}
+            {"name": "base_mint", "description": "Mint an NFT on BASE blockchain"},
+            {"name": "context7_docs", "description": "Get up-to-date documentation from Context7"}
         ]
     },
     "git": {
@@ -82,6 +83,14 @@ MCP_SERVERS = {
             {"name": "base_balance", "description": "Get the balance of an address on BASE blockchain"},
             {"name": "base_nfts", "description": "Get the NFTs owned by an address on BASE blockchain"}
         ]
+    },
+    "context7": {
+        "name": "Context7 MCP",
+        "port": 8009,
+        "tools": [
+            {"name": "resolve-library-id", "description": "Resolves a general library name into a Context7-compatible library ID"},
+            {"name": "get-library-docs", "description": "Fetches documentation for a library using a Context7-compatible library ID"}
+        ]
     }
 }
 
@@ -92,11 +101,11 @@ class MCPServer:
     """
     Mock MCP server implementation.
     """
-    
+
     def __init__(self, server_id: str, server_info: Dict):
         """
         Initialize the MCP server.
-        
+
         Args:
             server_id: The ID of the server.
             server_info: The server information.
@@ -106,7 +115,7 @@ class MCPServer:
         self.port = server_info["port"]
         self.tools = server_info["tools"]
         self.app = FastAPI(title=self.name, description=f"Mock MCP server for {self.name}")
-        
+
         # Add CORS middleware
         self.app.add_middleware(
             CORSMiddleware,
@@ -115,10 +124,10 @@ class MCPServer:
             allow_methods=["*"],
             allow_headers=["*"],
         )
-        
+
         # Add routes
         self.setup_routes()
-    
+
     def setup_routes(self):
         """
         Set up the routes for the server.
@@ -131,32 +140,32 @@ class MCPServer:
                 "status": "online",
                 "tools_count": len(self.tools)
             }
-        
+
         @self.app.get("/health")
         async def health():
             return {"status": "ok"}
-        
+
         @self.app.get("/tools")
         async def get_tools():
             return {"tools": self.tools}
-        
+
         @self.app.post("/execute")
         async def execute(request: Request):
             data = await request.json()
             tool_name = data.get("tool")
             params = data.get("params", {})
-            
+
             # Find the tool
             tool = next((t for t in self.tools if t["name"] == tool_name), None)
             if not tool:
                 raise HTTPException(status_code=404, detail=f"Tool {tool_name} not found")
-            
+
             # Mock execution
             return {
                 "result": f"Executed {tool_name} with params {params}",
                 "status": "success"
             }
-    
+
     async def start(self):
         """
         Start the server.
@@ -174,7 +183,7 @@ class MCPServer:
 async def start_server(server_id: str):
     """
     Start a server.
-    
+
     Args:
         server_id: The ID of the server to start.
     """
@@ -182,12 +191,12 @@ async def start_server(server_id: str):
     if not server_info:
         print(f"Error: Unknown server ID: {server_id}")
         return
-    
+
     print(f"Starting {server_info['name']} on port {server_info['port']}...")
-    
+
     server = MCPServer(server_id, server_info)
     running_servers[server_id] = server
-    
+
     await server.start()
 
 
@@ -199,7 +208,7 @@ async def start_all_servers():
     for server_id in MCP_SERVERS:
         task = asyncio.create_task(start_server(server_id))
         tasks.append(task)
-    
+
     await asyncio.gather(*tasks)
 
 
@@ -208,17 +217,17 @@ def main():
     Main entry point.
     """
     parser = argparse.ArgumentParser(description="Mock MCP servers for ESC-APE")
-    
+
     # Create subparsers for different commands
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
-    
+
     # Start command
     start_parser = subparsers.add_parser("start", help="Start servers")
     start_parser.add_argument("server_id", nargs="?", help="ID of the server to start (omit to start all)")
-    
+
     # Parse arguments
     args = parser.parse_args()
-    
+
     # Handle commands
     if args.command == "start":
         if args.server_id:

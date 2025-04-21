@@ -52,6 +52,12 @@ MCP_SERVERS = {
         "module": "servers.base.server",
         "port": 8008,
         "depends_on": []
+    },
+    "context7": {
+        "name": "Context7 MCP",
+        "module": "servers.context7.server",
+        "port": 8009,
+        "depends_on": []
     }
 }
 
