@@ -12,6 +12,7 @@ import logging
 import asyncio
 import argparse
 from typing import Dict, List, Optional, Any, Union
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -73,17 +74,17 @@ TOOLS = [
     },
     {
         "name": "get-library-docs",
-        "description": "Fetches documentation for a library using a Context7-compatible library ID.",
+        "description": "Fetches documentation for a library using a Context7-compatible library ID. Use 'project', 'escape', or 'esc-ape' as the library ID to get project documentation from Planning.md and Task.md.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "context7CompatibleLibraryID": {
                     "type": "string",
-                    "description": "Context7-compatible library ID"
+                    "description": "Context7-compatible library ID. Use 'project', 'escape', or 'esc-ape' to get project documentation."
                 },
                 "topic": {
                     "type": "string",
-                    "description": "Focus the docs on a specific topic (e.g., 'routing', 'hooks')"
+                    "description": "Focus the docs on a specific topic (e.g., 'routing', 'hooks', 'authentication', 'database')"
                 },
                 "tokens": {
                     "type": "integer",
@@ -95,6 +96,40 @@ TOOLS = [
         }
     }
 ]
+
+# Function to read project documentation files
+def read_project_docs() -> str:
+    """
+    Read the Planning.md and Task.md files to provide context about the project.
+
+    Returns:
+        A string containing the contents of the Planning.md and Task.md files.
+    """
+    project_root = Path(os.path.abspath(__file__)).parents[2]  # Go up 2 levels from this file
+    planning_path = project_root / "PLANNING.md"
+    task_path = project_root / "TASK.md"
+
+    docs = ""
+
+    # Read Planning.md if it exists
+    if planning_path.exists():
+        try:
+            with open(planning_path, "r") as f:
+                planning_content = f.read()
+                docs += "# Project Planning\n\n" + planning_content + "\n\n"
+        except Exception as e:
+            logger.error(f"Error reading Planning.md: {e}")
+
+    # Read Task.md if it exists
+    if task_path.exists():
+        try:
+            with open(task_path, "r") as f:
+                task_content = f.read()
+                docs += "# Current Tasks\n\n" + task_content
+        except Exception as e:
+            logger.error(f"Error reading Task.md: {e}")
+
+    return docs
 
 # Mock library data for demonstration purposes
 MOCK_LIBRARIES = {
@@ -131,7 +166,7 @@ async def get_tools():
 async def resolve_library_id(request: ResolveLibraryIdRequest):
     """Resolve a library name to a Context7-compatible library ID."""
     library_name = request.libraryName or ""
-    
+
     # Simple mock implementation
     if "react" in library_name.lower():
         return {"libraryId": "react@18.2.0"}
@@ -149,40 +184,75 @@ async def get_library_docs(request: GetLibraryDocsRequest):
     library_id = request.context7CompatibleLibraryID
     topic = request.topic
     tokens = request.tokens or 5000
-    
+
+    # Special case for project documentation
+    if library_id.lower() in ["project", "escape", "esc-ape"]:
+        project_docs = read_project_docs()
+
+        # Filter by topic if provided
+        if topic:
+            topic_lower = topic.lower()
+            lines = project_docs.split("\n")
+            filtered_lines = []
+            include_section = False
+
+            for line in lines:
+                if line.lower().startswith("## ") or line.lower().startswith("# "):
+                    include_section = topic_lower in line.lower()
+
+                if include_section or topic_lower in line.lower():
+                    filtered_lines.append(line)
+
+            project_docs = "\n".join(filtered_lines)
+
+        # Truncate to approximate token count
+        words = project_docs.split()
+        if len(words) > tokens / 0.75:  # Assuming ~0.75 words per token
+            words = words[:int(tokens / 0.75)]
+            project_docs = " ".join(words) + "...\n\n[Documentation truncated due to token limit]"
+
+        return {"documentation": project_docs}
+
     # Extract the library name from the ID (e.g., "react@18.2.0" -> "react")
     library_name = library_id.split("@")[0] if "@" in library_id else library_id
-    
+
     # Find the library in our mock data
     for lib_key, lib_data in MOCK_LIBRARIES.items():
         if lib_key == library_name or lib_data["id"] == library_id:
-            docs = lib_data["documentation"]
-            
-            # Filter by topic if provided
+            # First include project documentation for context
+            project_docs = read_project_docs()
+
+            # Then include the library documentation
+            lib_docs = lib_data["documentation"]
+
+            # Filter library docs by topic if provided
             if topic:
                 # Very simple topic filtering for demonstration
                 topic_lower = topic.lower()
-                lines = docs.split("\n")
+                lines = lib_docs.split("\n")
                 filtered_lines = []
                 include_section = False
-                
+
                 for line in lines:
                     if line.lower().startswith("## ") or line.lower().startswith("# "):
                         include_section = topic_lower in line.lower()
-                    
+
                     if include_section or topic_lower in line.lower():
                         filtered_lines.append(line)
-                
-                docs = "\n".join(filtered_lines)
-            
+
+                lib_docs = "\n".join(filtered_lines)
+
+            # Combine project docs and library docs
+            combined_docs = "# Project Context\n\n" + project_docs + "\n\n# Library Documentation\n\n" + lib_docs
+
             # Truncate to approximate token count (very rough approximation)
-            words = docs.split()
+            words = combined_docs.split()
             if len(words) > tokens / 0.75:  # Assuming ~0.75 words per token
                 words = words[:int(tokens / 0.75)]
-                docs = " ".join(words) + "...\n\n[Documentation truncated due to token limit]"
-            
-            return {"documentation": docs}
-    
+                combined_docs = " ".join(words) + "...\n\n[Documentation truncated due to token limit]"
+
+            return {"documentation": combined_docs}
+
     # If library not found
     raise HTTPException(status_code=404, detail=f"Library '{library_id}' not found")
 
@@ -199,6 +269,6 @@ def parse_args():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     args = parse_args()
     uvicorn.run(app, host=args.host, port=args.port)

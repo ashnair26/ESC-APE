@@ -130,6 +130,24 @@ def start_server(server_id: str, env: Optional[Dict[str, str]] = None) -> Option
         print(f"{Colors.YELLOW}Server {server_info['name']} is already running{Colors.ENDC}")
         return None
 
+    # Special case for Context7 server
+    if server_id == "context7":
+        print(f"{Colors.BLUE}Starting {server_info['name']} with uvicorn...{Colors.ENDC}")
+        try:
+            # Use uvicorn to start the server
+            cmd = ["python3", "-m", "uvicorn", "servers.context7.server:app", "--host", "0.0.0.0", "--port", str(server_info["port"])]
+            process = subprocess.Popen(
+                cmd,
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            return process
+        except Exception as e:
+            print(f"{Colors.RED}Error starting {server_info['name']}: {e}{Colors.ENDC}")
+            return None
+
     # Start the server
     print(f"{Colors.BLUE}Starting {server_info['name']}...{Colors.ENDC}")
 
