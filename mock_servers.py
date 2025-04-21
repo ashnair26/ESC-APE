@@ -33,7 +33,11 @@ MCP_SERVERS = {
             {"name": "sanity_fetch", "description": "Fetch content from Sanity CMS"},
             {"name": "privy_auth", "description": "Authenticate with Privy"},
             {"name": "base_mint", "description": "Mint an NFT on BASE blockchain"},
-            {"name": "context7_docs", "description": "Get up-to-date documentation from Context7"}
+            {"name": "context7_resolve_library_id", "description": "Resolves a general library name into a Context7-compatible library ID"},
+            {"name": "context7_get_library_docs", "description": "Fetches documentation for a library using a Context7-compatible library ID"},
+            {"name": "figma_get_file", "description": "Retrieves a Figma file by its key"},
+            {"name": "figma_get_components", "description": "Retrieves components from a Figma file"},
+            {"name": "figma_get_styles", "description": "Retrieves styles from a Figma file"}
         ]
     },
     "git": {
@@ -90,6 +94,15 @@ MCP_SERVERS = {
         "tools": [
             {"name": "resolve-library-id", "description": "Resolves a general library name into a Context7-compatible library ID"},
             {"name": "get-library-docs", "description": "Fetches documentation for a library using a Context7-compatible library ID"}
+        ]
+    },
+    "figma": {
+        "name": "Figma MCP",
+        "port": 8010,
+        "tools": [
+            {"name": "get-file", "description": "Retrieves a Figma file by its key"},
+            {"name": "get-components", "description": "Retrieves components from a Figma file"},
+            {"name": "get-styles", "description": "Retrieves styles from a Figma file"}
         ]
     }
 }

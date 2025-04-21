@@ -101,6 +101,11 @@ ESCAPE/
 │   │   ├── server.py         # Main server implementation
 │   │   ├── client.py         # Context7 client implementation
 │   │   └── tests/            # Tests for the Context7 server
+│   ├── figma/                # Figma MCP server
+│   │   ├── __init__.py
+│   │   ├── server.py         # Main server implementation
+│   │   ├── client.py         # Figma client implementation
+│   │   └── tests/            # Tests for the Figma server
 │   └── ...                   # Other servers
 ├── core/                     # Shared core functionality
 │   ├── __init__.py
@@ -195,6 +200,7 @@ ESCAPE/
   - Context7 MCP server for up-to-date documentation for LLMs and AI code editors
   - Privy MCP server for authentication
   - BASE MCP server for blockchain integration
+  - Figma MCP server for design system integration
 - Create integration examples
 - Improve documentation
 

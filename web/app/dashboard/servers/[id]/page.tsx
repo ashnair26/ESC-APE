@@ -33,7 +33,8 @@ export default function ServerDetailPage() {
       supabase: 8006,
       sanity: 8007,
       base: 8008,
-      context7: 8009
+      context7: 8009,
+      figma: 8010
     };
 
     const port = serverPorts[id];
@@ -49,7 +50,8 @@ export default function ServerDetailPage() {
       supabase: 'Supabase MCP',
       sanity: 'Sanity CMS',
       base: 'BASE MCP',
-      context7: 'Context7 MCP'
+      context7: 'Context7 MCP',
+      figma: 'Figma MCP'
     };
 
     return serverNames[id] || id.charAt(0).toUpperCase() + id.slice(1);
@@ -64,7 +66,8 @@ export default function ServerDetailPage() {
       supabase: 'Supabase database integration server',
       sanity: 'Sanity CMS integration server',
       base: 'BASE blockchain integration server',
-      context7: 'Up-to-date documentation for LLMs and AI code editors'
+      context7: 'Up-to-date documentation for LLMs and AI code editors',
+      figma: 'Figma design system integration server'
     };
 
     return serverDescriptions[id] || '';

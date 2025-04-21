@@ -95,6 +95,17 @@ const realServers: Server[] = [
     tools: 0,
     lastPingTimestamp: null,
     lastPing: 'Never'
+  },
+  {
+    id: 'figma',
+    name: 'Figma MCP',
+    description: 'Figma design system integration server',
+    status: 'checking',
+    url: 'http://localhost:8010',
+    type: 'figma',
+    tools: 0,
+    lastPingTimestamp: null,
+    lastPing: 'Never'
   }
 ];
 

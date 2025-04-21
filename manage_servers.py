@@ -58,6 +58,12 @@ MCP_SERVERS = {
         "module": "servers.context7.server",
         "port": 8009,
         "depends_on": []
+    },
+    "figma": {
+        "name": "Figma MCP",
+        "module": "servers.figma.server",
+        "port": 8010,
+        "depends_on": []
     }
 }
 
@@ -130,12 +136,12 @@ def start_server(server_id: str, env: Optional[Dict[str, str]] = None) -> Option
         print(f"{Colors.YELLOW}Server {server_info['name']} is already running{Colors.ENDC}")
         return None
 
-    # Special case for Context7 server
-    if server_id == "context7":
+    # Special case for Context7 and Figma servers
+    if server_id in ["context7", "figma"]:
         print(f"{Colors.BLUE}Starting {server_info['name']} with uvicorn...{Colors.ENDC}")
         try:
             # Use uvicorn to start the server
-            cmd = ["python3", "-m", "uvicorn", "servers.context7.server:app", "--host", "0.0.0.0", "--port", str(server_info["port"])]
+            cmd = ["python3", "-m", "uvicorn", f"servers.{server_id}.server:app", "--host", "0.0.0.0", "--port", str(server_info["port"])]
             process = subprocess.Popen(
                 cmd,
                 env=env,

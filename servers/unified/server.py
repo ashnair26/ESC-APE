@@ -18,6 +18,8 @@ from servers.git.server import mcp as git_mcp
 from servers.sanity.server import mcp as sanity_mcp
 from servers.privy.server import mcp as privy_mcp
 from servers.base.server import mcp as base_mcp
+from servers.context7.server import app as context7_app
+from servers.figma.server import app as figma_app
 
 # Import authentication utilities
 from core.auth import setup_auth_middleware
@@ -33,6 +35,55 @@ setup_auth_middleware(
     required_scopes=["mcp:access"],
     skip_auth=skip_auth
 )
+
+
+# Adapter functions for FastAPI-based MCP servers
+async def context7_resolve_library_id(libraryName: str = None) -> dict:
+    """Resolves a general library name into a Context7-compatible library ID."""
+    # This would normally make an HTTP request to the Context7 server
+    # For simplicity, we'll just return a mock response
+    return {"libraryId": f"{libraryName or 'react'}@latest"}
+
+
+async def context7_get_library_docs(context7CompatibleLibraryID: str, topic: str = None, tokens: int = 5000) -> dict:
+    """Fetches documentation for a library using a Context7-compatible library ID."""
+    # This would normally make an HTTP request to the Context7 server
+    # For simplicity, we'll just return a mock response
+    return {"documentation": f"Documentation for {context7CompatibleLibraryID}"}
+
+
+async def figma_get_file(fileKey: str, accessToken: str = None) -> dict:
+    """Retrieves a Figma file by its key."""
+    # This would normally make an HTTP request to the Figma server
+    # For simplicity, we'll just return a mock response
+    return {
+        "document": {"id": "0:0", "name": "Document"},
+        "name": f"Figma file: {fileKey}"
+    }
+
+
+async def figma_get_components(fileKey: str, accessToken: str = None) -> dict:
+    """Retrieves components from a Figma file."""
+    # This would normally make an HTTP request to the Figma server
+    # For simplicity, we'll just return a mock response
+    return {
+        "components": [
+            {"id": "1:0", "name": "Button"},
+            {"id": "1:1", "name": "Card"}
+        ]
+    }
+
+
+async def figma_get_styles(fileKey: str, accessToken: str = None) -> dict:
+    """Retrieves styles from a Figma file."""
+    # This would normally make an HTTP request to the Figma server
+    # For simplicity, we'll just return a mock response
+    return {
+        "styles": [
+            {"id": "S:1", "name": "Primary"},
+            {"id": "S:2", "name": "Secondary"}
+        ]
+    }
 
 
 def import_tools_from_server(source_mcp: FastMCP) -> List:
@@ -80,3 +131,36 @@ def register_tools_from_server(source_mcp: FastMCP, prefix: Optional[str] = None
             func=tool.func,
             description=tool.description
         )
+
+
+# Register Context7 tools
+mcp.register_tool(
+    name="context7_resolve_library_id",
+    func=context7_resolve_library_id,
+    description="Resolves a general library name into a Context7-compatible library ID"
+)
+
+mcp.register_tool(
+    name="context7_get_library_docs",
+    func=context7_get_library_docs,
+    description="Fetches documentation for a library using a Context7-compatible library ID"
+)
+
+# Register Figma tools
+mcp.register_tool(
+    name="figma_get_file",
+    func=figma_get_file,
+    description="Retrieves a Figma file by its key"
+)
+
+mcp.register_tool(
+    name="figma_get_components",
+    func=figma_get_components,
+    description="Retrieves components from a Figma file"
+)
+
+mcp.register_tool(
+    name="figma_get_styles",
+    func=figma_get_styles,
+    description="Retrieves styles from a Figma file"
+)
