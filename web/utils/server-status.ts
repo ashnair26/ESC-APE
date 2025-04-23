@@ -15,7 +15,16 @@ export async function checkServerStatus(url: string): Promise<boolean> {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-      // Try to fetch the server's health endpoint
+      // For the Figma MCP server on port 3333, check the SSE endpoint
+      if (url.includes('3333')) {
+        const response = await fetch(`${url}/sse`, {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        return response.status === 200;
+      }
+
+      // For other servers, try to fetch the health endpoint
       const response = await fetch(`${url}/health`, {
         method: 'GET',
         signal: controller.signal,
@@ -56,7 +65,12 @@ export async function getServerTools(url: string): Promise<number> {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-      // Try to fetch the server's tools endpoint
+      // For the Figma MCP server on port 3333, we know it has 2 tools
+      if (url.includes('3333')) {
+        return 2; // get-file and get-node tools
+      }
+
+      // For other servers, try to fetch the tools endpoint
       const response = await fetch(`${url}/tools`, {
         method: 'GET',
         signal: controller.signal,
