@@ -325,7 +325,7 @@ export default function WelcomeOnboardingPage() {
         setAnimateProgress(false); // Reset animation trigger after timeout
       }, 400); // Match duration with Step 1->2
 
-    } else {
+      } else {
         alert('Please enter and validate an available town name.');
       }
     } else if (step === 3) {
@@ -419,12 +419,13 @@ export default function WelcomeOnboardingPage() {
         {showFirstScreen && (
           <>
             {/* Welcome text - positioned below progress bars */}
-            <div ref={welcomeTextRef} className="content-animation-2 welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px' }}>
+            <div ref={welcomeTextRef} className="content-animation-2 welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Hello! What would you like to do?</h1>
             </div>
 
             {/* Selection buttons */}
             <div ref={buttonsContainerRef} className="content-animation-3 buttons-container" style={{
+              opacity: 0, // Start invisible
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
@@ -501,12 +502,13 @@ export default function WelcomeOnboardingPage() {
         {showSecondScreen && (
           <>
             {/* Heading - Added ref, removed hardcoded animation class */}
-            <div ref={step2HeadingRef} className="second-screen-heading" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px' }}>
+            <div ref={step2HeadingRef} className="second-screen-heading" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Tell us more about your Town?</h1>
             </div>
 
             {/* Form Container - Added ref, removed hardcoded animation class */}
             <div ref={step2FormContainerRef} className="second-screen-form-container" style={{
+              opacity: 0, // Start invisible
               display: 'flex',
               flexDirection: 'column',
               gap: '3.25px',
@@ -654,13 +656,13 @@ export default function WelcomeOnboardingPage() {
         {showThirdScreen && (
           <>
             {/* Heading - Added ref, removed hardcoded animation class */}
-            <div ref={step3HeadingRef} className="" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px' }}>
+            <div ref={step3HeadingRef} className="" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Let's set up your brand colors next!</h1>
             </div>
 
             {/* Color Palette Card - Added ref, removed hardcoded animation class, adjusted width */}
             <div ref={step3CardRef} className="" style={{
-              // Removed maxWidth: '450px' and horizontal auto margin
+              opacity: 0, // Start invisible
               marginTop: '40px', // Keep top margin
               width: '100%', // Allow it to fill container width
               padding: '20px',
