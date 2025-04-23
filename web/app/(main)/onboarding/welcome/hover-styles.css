@@ -1,0 +1,239 @@
+/* Style for the selected button */
+.onboarding-option-btn.active-selection {
+  background-color: rgba(194, 0, 35, 0.5) !important; /* Red BG */
+  border: 2px solid #C20023 !important; /* Red Border */
+}
+
+/* Hover style when NO button is selected */
+/* Targets the container to check if it does NOT contain an active selection */
+.buttons-container:not(:has(.active-selection)) .onboarding-option-btn:hover {
+  background-color: rgba(194, 0, 35, 0.5) !important; /* Red BG */
+  border: 2px solid #C20023 !important; /* Red Border */
+}
+
+/* Hover style for UNSELECTED button when ANOTHER button IS selected */
+/* Targets the container to check if it DOES contain an active selection */
+.buttons-container:has(.active-selection) .onboarding-option-btn:not(.active-selection):hover {
+  background-color: transparent !important; /* Keep original background */
+  border: 2px solid #C20023 !important; /* Red Border ONLY */
+}
+
+
+/* Card entry animation */
+@keyframes cardEntryAnimation {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.card-entry-animation {
+  animation: cardEntryAnimation 0.6s ease-out forwards;
+}
+
+/* Content fade-in animation */
+@keyframes contentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-animation-1 {
+  animation: contentFadeIn 0.5s ease-out 0.3s forwards;
+  /* opacity set inline */
+}
+
+.content-animation-2 {
+  animation: contentFadeIn 0.5s ease-out 0.5s forwards;
+  /* opacity set inline */
+}
+
+.content-animation-3 {
+  animation: contentFadeIn 0.5s ease-out 0.7s forwards;
+  /* opacity set inline */
+}
+
+/* Transition animations */
+@keyframes slideOutLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-300px);
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes slideOutRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(300px);
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(300px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-300px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+.slide-out-left {
+  animation: slideOutLeft 0.8s ease-out forwards !important;
+}
+
+.slide-out-left-delay-1 {
+  animation: slideOutLeft 0.8s ease-out 0.1s forwards !important;
+}
+
+.slide-out-left-delay-2 {
+  animation: slideOutLeft 0.8s ease-out 0.2s forwards !important;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.8s ease-out forwards;
+  /* opacity set inline */
+}
+
+.slide-in-right-delay-1 {
+  animation: slideInRight 0.8s ease-out 0.1s forwards;
+  /* opacity set inline */
+}
+
+.slide-in-right-delay-2 {
+  animation: slideInRight 0.8s ease-out 0.2s forwards;
+  /* opacity set inline */
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.8s ease-out forwards !important;
+}
+
+.slide-out-right-delay-1 {
+  animation: slideOutRight 0.8s ease-out 0.1s forwards !important;
+}
+
+.slide-out-right-delay-2 {
+  animation: slideOutRight 0.8s ease-out 0.2s forwards !important;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+  /* opacity set inline */
+}
+
+.slide-in-left-delay-1 {
+  animation: slideInLeft 0.8s ease-out 0.1s forwards;
+  /* opacity set inline */
+}
+
+
+/* Progress bar fill animation */
+@keyframes progressFill {
+  0% {
+    width: 0%;
+    background-color: #C20023;
+  }
+  60% {
+    width: 75%;
+    background-color: #C20023;
+  }
+  85% {
+    width: 92%;
+    background-color: #C20023;
+  }
+  100% {
+    width: 100%;
+    background-color: #C20023;
+  }
+}
+
+.progress-fill-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #4b5563; /* gray-600 */
+}
+
+.progress-fill-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background-color: #C20023;
+  animation: progressFill 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards;
+}
+
+/* Check button animation */
+@keyframes checkButtonSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Removed checkButtonSuccess keyframes */
+
+.check-button-spin {
+  animation: checkButtonSpin 0.8s ease-in-out;
+}
+
+/* Removed .check-button-success rule */
+
+/* Text fade in animation */
+@keyframes textFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.text-fade-in {
+  animation: textFadeIn 0.5s ease-out forwards;
+}
