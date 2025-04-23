@@ -619,8 +619,7 @@ export default function WelcomeOnboardingPage() {
 
               {/* Description Input - Conditionally rendered */}
               {isNameChecked && isNameAvailable && (
-                 // Removed className="text-fade-in" from this container
-                <div style={{ marginTop: '20px' }}>
+                <div className="text-fade-in" style={{ marginTop: '20px', opacity: 0 }}>
                   {/* Label and character count for description */}
                   <div style={{ marginBottom: '0.325px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <label className="text-white text-lg" style={{ fontFamily: 'League Spartan, sans-serif' }}>Describe your Town</label> {/* Changed capitalization */}
