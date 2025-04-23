@@ -17,11 +17,18 @@ export async function checkServerStatus(url: string): Promise<boolean> {
 
       // For the Figma MCP server on port 3333, check the SSE endpoint
       if (url.includes('3333')) {
-        const response = await fetch(`${url}/sse`, {
-          method: 'GET',
-          signal: controller.signal,
-        });
-        return response.status === 200;
+        console.log('Checking Figma MCP server at', url);
+        try {
+          const response = await fetch(`${url}/sse`, {
+            method: 'GET',
+            signal: controller.signal,
+          });
+          console.log('Figma MCP server response status:', response.status);
+          return response.status === 200;
+        } catch (error) {
+          console.error('Error checking Figma MCP server:', error);
+          return false;
+        }
       }
 
       // For other servers, try to fetch the health endpoint
@@ -67,6 +74,8 @@ export async function getServerTools(url: string): Promise<number> {
 
       // For the Figma MCP server on port 3333, we know it has 2 tools
       if (url.includes('3333')) {
+        console.log('Getting tools for Figma MCP server at', url);
+        console.log('Returning 2 tools for Figma MCP server');
         return 2; // get-file and get-node tools
       }
 
