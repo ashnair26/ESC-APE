@@ -194,7 +194,7 @@ export default function WelcomeOnboardingPage() {
     setSecondaryColor('');
     setAccentColor('');
 
-    // Start the animation sequence
+    // Start the progress bar animation and content animations simultaneously
     setAnimateProgress(true);
 
     // Add animation classes to current content using refs
@@ -224,22 +224,24 @@ export default function WelcomeOnboardingPage() {
       setStep(2);
       // Keep selectedOption as 'create'
 
-        // Programmatically add slide-in-right for Step 2 entry
-        requestAnimationFrame(() => {
-          if (step2HeadingRef.current) {
-            step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-left');
-            step2HeadingRef.current.offsetHeight; // Force reflow
-            step2HeadingRef.current.classList.add('slide-in-right');
-          }
-          if (step2FormContainerRef.current) {
-            step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-left-delay-1');
-            step2FormContainerRef.current.offsetHeight; // Force reflow
-            step2FormContainerRef.current.classList.add('slide-in-right-delay-1');
-          }
-        });
-        setAnimateProgress(false); // Reset animation trigger after timeout
-      }, 400); // Adjust timing if needed
-    };
+      // Programmatically add slide-in-right for Step 2 entry
+      requestAnimationFrame(() => {
+        if (step2HeadingRef.current) {
+          step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-left');
+          step2HeadingRef.current.offsetHeight; // Force reflow
+          step2HeadingRef.current.classList.add('slide-in-right');
+        }
+        if (step2FormContainerRef.current) {
+          step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-left-delay-1');
+          step2FormContainerRef.current.offsetHeight; // Force reflow
+          step2FormContainerRef.current.classList.add('slide-in-right-delay-1');
+        }
+      });
+
+      // Don't reset animation trigger - let it complete naturally
+      // The progress bar animation will finish on its own
+    }, 400); // Adjust timing if needed
+  };
 
   // Handle checking if town name is available
   const checkTownName = () => {
@@ -292,7 +294,7 @@ export default function WelcomeOnboardingPage() {
 
         // --- Transition to Step 3 ---
         console.log('Transitioning from Step 2 to Step 3');
-        setAnimateProgress(true); // Set BEFORE timeout, matching Step 1->2
+        setAnimateProgress(true); // Start progress bar animation simultaneously with content animations
 
         // Add slide-out-left animations to Step 2 elements
         if (step2HeadingRef.current) step2HeadingRef.current.classList.add('slide-out-left');
@@ -300,7 +302,6 @@ export default function WelcomeOnboardingPage() {
 
         // Show Step 3 after animation delay
         setTimeout(() => {
-          // Removed nested timeout
           setShowSecondScreen(false);
           setShowThirdScreen(true);
           setStep(3);
@@ -309,21 +310,23 @@ export default function WelcomeOnboardingPage() {
           setSecondaryColor('');
           setAccentColor('');
 
-        // Programmatically add slide-in-right for Step 3 entry AFTER state update
-        requestAnimationFrame(() => {
-          if (step3HeadingRef.current) {
-            step3HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left'); // Clean up exit classes
-            step3HeadingRef.current.offsetHeight; // Force reflow
-            step3HeadingRef.current.classList.add('slide-in-right');
-          }
-          if (step3CardRef.current) {
-            step3CardRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1'); // Clean up exit classes
-            step3CardRef.current.offsetHeight; // Force reflow
-            step3CardRef.current.classList.add('slide-in-right-delay-1');
-          }
-        });
-        setAnimateProgress(false); // Reset animation trigger after timeout
-      }, 400); // Match duration with Step 1->2
+          // Programmatically add slide-in-right for Step 3 entry AFTER state update
+          requestAnimationFrame(() => {
+            if (step3HeadingRef.current) {
+              step3HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left'); // Clean up exit classes
+              step3HeadingRef.current.offsetHeight; // Force reflow
+              step3HeadingRef.current.classList.add('slide-in-right');
+            }
+            if (step3CardRef.current) {
+              step3CardRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1'); // Clean up exit classes
+              step3CardRef.current.offsetHeight; // Force reflow
+              step3CardRef.current.classList.add('slide-in-right-delay-1');
+            }
+          });
+
+          // Don't reset animation trigger - let it complete naturally
+          // The progress bar animation will finish on its own
+        }, 400); // Match duration with Step 1->2
 
     } else {
         alert('Please enter and validate an available town name.');

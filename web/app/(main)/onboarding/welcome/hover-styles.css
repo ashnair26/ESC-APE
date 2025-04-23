@@ -173,12 +173,12 @@
     width: 0%;
     background-color: #C20023;
   }
-  60% {
-    width: 75%;
+  30% {
+    width: 50%;
     background-color: #C20023;
   }
-  85% {
-    width: 92%;
+  60% {
+    width: 80%;
     background-color: #C20023;
   }
   100% {
@@ -201,7 +201,7 @@
   height: 100%;
   width: 0;
   background-color: #C20023;
-  animation: progressFill 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards;
+  animation: progressFill 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 /* Check button animation */
