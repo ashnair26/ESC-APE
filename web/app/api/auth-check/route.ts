@@ -71,38 +71,45 @@ export async function POST(req: NextRequest) {
     console.log(`[Auth Check] User upserted/found in Supabase: ${upsertedUser?.id}`);
 
 
-    // --- TODO: Implement Routing Logic based on PLANNING.md ---
-    // This part needs the actual logic to check creator/member status
+    // Implement Routing Logic based on PLANNING.md
+    // Check user roles and redirect accordingly
 
-    // 3. Check if Creator (Placeholder - needs actual implementation)
-    // Example: Check if user ID exists in a 'creators' table
-    // const { data: creatorData, error: creatorError } = await supabaseAdmin
-    //   .from('creators') // Assuming a 'creators' table linked to 'users'
-    //   .select('id')
-    //   .eq('user_id', privyUserId) // Assuming link via privyUserId/users.id
-    //   .maybeSingle();
-    // if (creatorData) {
-    //   console.log('[Auth Check] User is a Creator. Redirecting to dashboard.');
-    //   return NextResponse.json({ redirect: '/creator-dashboard' });
-    // }
+    // 3. Check if Creator
+    const { data: creatorData, error: creatorError } = await supabaseAdmin
+      .from('creators')
+      .select('id, community_id')
+      .eq('privy_id', privyUserId)
+      .maybeSingle();
 
-    // 4. Check if Member (Placeholder - needs actual implementation)
-    // Example: Check 'community_members' table
-    // const { data: memberData, error: memberError } = await supabaseAdmin
-    //   .from('community_members') // Assuming this table exists
-    //   .select('communities(slug)') // Assuming relation to get community slug
-    //   .eq('user_id', privyUserId)
-    //   .limit(1)
-    //   .maybeSingle();
-    // if (memberData && memberData.communities) {
-    //   console.log(`[Auth Check] User is a Member of ${memberData.communities.slug}. Redirecting.`);
-    //   return NextResponse.json({ redirect: `/community/${memberData.communities.slug}` });
-    // }
+    if (creatorError) {
+      console.error('[Auth Check] Error checking creator status:', creatorError);
+    }
+
+    if (creatorData) {
+      console.log('[Auth Check] User is a Creator. Redirecting to creator dashboard.');
+      return NextResponse.json({ redirect: '/creator-dashboard' });
+    }
+
+    // 4. Check if Member
+    const { data: memberData, error: memberError } = await supabaseAdmin
+      .from('community_members')
+      .select('community:communities(slug)')
+      .eq('user_id', upsertedUser.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (memberError) {
+      console.error('[Auth Check] Error checking member status:', memberError);
+    }
+
+    if (memberData && memberData.community) {
+      console.log(`[Auth Check] User is a Member of ${memberData.community.slug}. Redirecting.`);
+      return NextResponse.json({ redirect: `/community/${memberData.community.slug}` });
+    }
 
     // 5. New User - Redirect to Onboarding
     console.log('[Auth Check] New user or no specific role found. Redirecting to onboarding.');
     return NextResponse.json({ redirect: '/onboarding/welcome' });
-    // --- End of TODO ---
 
   } catch (error: any) {
     console.error('[Auth Check] Error:', error);

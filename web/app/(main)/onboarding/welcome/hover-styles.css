@@ -4,51 +4,29 @@
   border: 2px solid #C20023 !important; /* Red Border */
 }
 
-/* Hover style when NO button is selected */
-/* Targets the container to check if it does NOT contain an active selection */
-.buttons-container:not(:has(.active-selection)) .onboarding-option-btn:hover {
+/* Restore basic hover effect for Step 1 buttons */
+.onboarding-option-btn:hover {
   background-color: rgba(194, 0, 35, 0.5) !important; /* Red BG */
   border: 2px solid #C20023 !important; /* Red Border */
 }
 
-/* Hover style for UNSELECTED button when ANOTHER button IS selected */
-/* Targets the container to check if it DOES contain an active selection */
-.buttons-container:has(.active-selection) .onboarding-option-btn:not(.active-selection):hover {
-  background-color: transparent !important; /* Keep original background */
-  border: 2px solid #C20023 !important; /* Red Border ONLY */
-}
 
+/* --- Removed Card Flip Animation CSS --- */
 
-/* Card entry animation */
-@keyframes cardEntryAnimation {
+/* --- Color Picker Slide Animation --- */
+@keyframes slideUpIn {
   0% {
+    transform: translateY(100%);
     opacity: 0;
-    transform: scale(0.9);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.02);
   }
   100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.card-entry-animation {
-  animation: cardEntryAnimation 0.6s ease-out forwards;
-}
-
-/* Content fade-in animation */
-@keyframes contentFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
   }
+}
+
+.color-picker-slide-up {
+  animation: slideUpIn 0.5s ease-out forwards;
 }
 
 .content-animation-1 {
@@ -237,3 +215,5 @@
 .text-fade-in {
   animation: textFadeIn 0.5s ease-out forwards;
 }
+
+/* --- Removed Card Flip Animation CSS --- */

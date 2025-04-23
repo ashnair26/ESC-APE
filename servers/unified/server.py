@@ -58,6 +58,7 @@ adapters = {
 
 
 # Adapter functions for Context7 MCP server
+@mcp.tool(description="Resolves a general library name into a Context7-compatible library ID.")
 async def context7_resolve_library_id(ctx: Context, libraryName: str = None) -> dict:
     """Resolves a general library name into a Context7-compatible library ID."""
     try:
@@ -66,7 +67,7 @@ async def context7_resolve_library_id(ctx: Context, libraryName: str = None) -> 
         logger.error(f"Error resolving library ID: {e}")
         return {"error": str(e)}
 
-
+@mcp.tool(description="Fetches documentation for a library using a Context7-compatible library ID.")
 async def context7_get_library_docs(ctx: Context, context7CompatibleLibraryID: str, topic: str = None, tokens: int = 5000) -> dict:
     """Fetches documentation for a library using a Context7-compatible library ID."""
     try:
@@ -77,6 +78,7 @@ async def context7_get_library_docs(ctx: Context, context7CompatibleLibraryID: s
 
 
 # Adapter functions for Figma MCP server
+@mcp.tool(description="Retrieves a Figma file by its key.")
 async def figma_get_file(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves a Figma file by its key."""
     try:
@@ -85,7 +87,7 @@ async def figma_get_file(ctx: Context, fileKey: str, accessToken: str = None) ->
         logger.error(f"Error getting Figma file: {e}")
         return {"error": str(e)}
 
-
+@mcp.tool(description="Retrieves components from a Figma file.")
 async def figma_get_components(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves components from a Figma file."""
     try:
@@ -94,7 +96,7 @@ async def figma_get_components(ctx: Context, fileKey: str, accessToken: str = No
         logger.error(f"Error getting Figma components: {e}")
         return {"error": str(e)}
 
-
+@mcp.tool(description="Retrieves styles from a Figma file.")
 async def figma_get_styles(ctx: Context, fileKey: str, accessToken: str = None) -> dict:
     """Retrieves styles from a Figma file."""
     try:
@@ -166,77 +168,28 @@ def register_tools_from_server(source_mcp: FastMCP, prefix: Optional[str] = None
             tool_name = tool.name
 
         # Register the tool with the unified server
-        mcp.register_tool(
-            name=tool_name,
-            func=tool.func,
-            description=tool.description
-        )
+# TODO: Need to re-implement registration/proxying for tools from other servers
+# The previous method using register_tools_from_server and mcp.register_tool is incompatible.
+# For now, only the adapter tools (Context7, Figma) decorated above will be available.
+logger.warning("Tool registration from Supabase, Git, Sanity, Privy, Base servers is currently disabled due to incompatibility.")
+logger.warning("Adapter initialization via on_startup/on_shutdown is disabled due to incompatibility.")
 
-
-# Register tools from FastMCP-based servers
-register_tools_from_server(supabase_mcp, prefix="supabase")
-register_tools_from_server(git_mcp, prefix="git")
-register_tools_from_server(sanity_mcp, prefix="sanity")
-register_tools_from_server(privy_mcp, prefix="privy")
-register_tools_from_server(base_mcp, prefix="base")
-
-# Register Context7 tools
-mcp.register_tool(
-    name="context7_resolve_library_id",
-    func=context7_resolve_library_id,
-    description="Resolves a general library name into a Context7-compatible library ID"
-)
-
-mcp.register_tool(
-    name="context7_get_library_docs",
-    func=context7_get_library_docs,
-    description="Fetches documentation for a library using a Context7-compatible library ID"
-)
-
-# Register Figma tools
-mcp.register_tool(
-    name="figma_get_file",
-    func=figma_get_file,
-    description="Retrieves a Figma file by its key"
-)
-
-mcp.register_tool(
-    name="figma_get_components",
-    func=figma_get_components,
-    description="Retrieves components from a Figma file"
-)
-
-mcp.register_tool(
-    name="figma_get_styles",
-    func=figma_get_styles,
-    description="Retrieves styles from a Figma file"
-)
-
-
-# Add lifecycle hooks
-@mcp.on_startup
-async def startup():
-    """Initialize the adapters when the server starts."""
-    logger.info("Initializing adapters...")
-    await initialize_adapters()
-    logger.info("Adapters initialized")
-
-
-@mcp.on_shutdown
-async def shutdown():
-    """Close the adapters when the server shuts down."""
-    logger.info("Closing adapters...")
-    await close_adapters()
-    logger.info("Adapters closed")
-
+# Removed incompatible lifecycle hooks (@mcp.on_startup, @mcp.on_shutdown)
+# The initialize_adapters() and close_adapters() functions are now unused here.
+# Adapter initialization might need to be handled differently (e.g., lazily within tool calls).
 
 # Add a main function to run the server
 if __name__ == "__main__":
-    import uvicorn
-    import asyncio
-
-    # Initialize the adapters
-    asyncio.run(initialize_adapters())
-
-    # Run the server
-    mcp.run_stdio()
+    # This script is intended to be run as a module by manage_servers.py
+    # or potentially directly via `python -m servers.unified.server`
+    # which might trigger internal FastMCP startup logic.
+    # For now, do nothing here to avoid conflicts with manage_servers.py
+    # If direct execution is needed, FastMCP's intended run method should be called.
+    logger.info("Unified server script executed directly. Use manage_servers.py or `python -m` to run.")
+    # Attempting to run stdio again, in case it's expected when run as module
+    try:
+        mcp.run_stdio()
+    except AttributeError:
+         logger.error("'FastMCP' object has no attribute 'run_stdio'. Server cannot start this way.")
+    except Exception as e:
+         logger.error(f"Error attempting to run FastMCP server: {e}")

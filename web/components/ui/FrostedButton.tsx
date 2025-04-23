@@ -24,7 +24,7 @@ export interface FrostedButtonProps extends React.ButtonHTMLAttributes<HTMLButto
 const FrostedButton = React.forwardRef<HTMLButtonElement, FrostedButtonProps>(
   ({ className = '', variant = 'default', size = 'default', ...props }, ref) => {
     // Base classes
-    const baseClasses = 'relative inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-["League Spartan"]';
+    const baseClasses = 'relative inline-flex items-center justify-center rounded-lg font-normal transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-["League Spartan"]';
 
     // Variant classes
     const variantClasses = {

@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Confetti from 'react-confetti';
+import { SketchPicker, ColorResult } from 'react-color'; // Import SketchPicker and ColorResult type
 import clsx from 'clsx';
 import { usePrivy } from '@privy-io/react-auth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -29,18 +31,25 @@ export default function WelcomeOnboardingPage() {
   const [primaryColor, setPrimaryColor] = useState('');
   const [secondaryColor, setSecondaryColor] = useState('');
   const [accentColor, setAccentColor] = useState('');
+  const [showFourthScreen, setShowFourthScreen] = useState(false); // State for step 4 visibility
+  const [recycleConfetti, setRecycleConfetti] = useState(true); // State for confetti
+  const [activePicker, setActivePicker] = useState<'primary' | 'secondary' | 'accent' | null>(null); // Re-add state for active picker
 
   // Refs for animation elements
   const welcomeTextRef = useRef<HTMLDivElement>(null);
   const buttonsContainerRef = useRef<HTMLDivElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
-  // Refs for Step 2 elements to animate out
+  // Refs for Step 2 elements
   const step2HeadingRef = useRef<HTMLDivElement>(null);
   const step2FormContainerRef = useRef<HTMLDivElement>(null);
-  // Refs for Step 3 elements to animate in
+  // Refs for Step 3 elements
   const step3HeadingRef = useRef<HTMLDivElement>(null);
   const step3CardRef = useRef<HTMLDivElement>(null);
+  // Refs for Step 4 elements
+  const step4HeadingRef = useRef<HTMLDivElement>(null);
+  const pickerContainerRef = useRef<HTMLDivElement>(null); // Ref for picker container
+
 
   // Reset form state when component unmounts
   useEffect(() => {
@@ -54,8 +63,50 @@ export default function WelcomeOnboardingPage() {
       setPrimaryColor('');
       setSecondaryColor('');
       setAccentColor('');
+      setRecycleConfetti(true); // Reset confetti state
+      setActivePicker(null); // Close picker on unmount
     };
   }, []);
+
+  // Effect to handle clicks outside the color picker
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerContainerRef.current && !pickerContainerRef.current.contains(event.target as Node)) {
+         // Check if the click target is NOT one of the picker trigger buttons
+         const targetElement = event.target as Element;
+         if (!targetElement.closest('button[data-picker-trigger]')) {
+            setActivePicker(null);
+         }
+      }
+    };
+
+    if (activePicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activePicker]); // Re-run if activePicker changes
+
+  // Effect to trigger initial Step 1 animations on mount
+  useEffect(() => {
+    if (step === 1 && showFirstScreen) {
+      requestAnimationFrame(() => {
+        if (welcomeTextRef.current) {
+          welcomeTextRef.current.classList.add('content-animation-2');
+          welcomeTextRef.current.style.opacity = '1'; // Ensure opacity is set if animation doesn't handle it
+        }
+        if (buttonsContainerRef.current) {
+          buttonsContainerRef.current.classList.add('content-animation-3');
+          buttonsContainerRef.current.style.opacity = '1'; // Ensure opacity is set
+        }
+      });
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
+
 
   // Basic loading state
   if (!ready) {
@@ -80,56 +131,74 @@ export default function WelcomeOnboardingPage() {
   // Handle going back to previous step
   const handleBack = () => {
     if (step > 1) {
-      // Force reset the input field directly in the DOM
-      const inputField = document.querySelector('input[type="text"]');
-      if (inputField) {
-        // @ts-ignore - we know this is an HTMLInputElement
-        inputField.value = '';
+      // Force reset the input field directly in the DOM (if applicable)
+      const nameInput = document.querySelector('input[type="text"][placeholder="Enter town name"]');
+      if (nameInput) {
+        // @ts-ignore
+        nameInput.value = '';
       }
+      const descInput = document.querySelector('textarea');
+       if (descInput) {
+         // @ts-ignore
+         descInput.value = '';
+       }
 
-      // REMOVED incorrect global reset block here
+      if (step === 4) {
+         // Going back from Step 4 to Step 3
+         if (step4HeadingRef.current) step4HeadingRef.current.classList.add('slide-out-right');
 
-      if (step === 3) {
+         setTimeout(() => {
+           setShowFourthScreen(false);
+           setShowThirdScreen(true);
+           setStep(3);
+           setAnimateProgress(false);
+
+           // Apply slide-in-left animations AFTER Step 3 is shown
+           requestAnimationFrame(() => {
+             if (step3HeadingRef.current) {
+               step3HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-right');
+               step3HeadingRef.current.classList.add('slide-in-left');
+             }
+             if (step3CardRef.current) {
+               step3CardRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-right-delay-1');
+               step3CardRef.current.classList.add('slide-in-left-delay-1');
+             }
+           });
+           // Reset only Step 4 related state if needed (none currently)
+         }, 400); // Match animation duration
+
+      } else if (step === 3) {
         // Going back from Step 3 to Step 2
-        // Add slide-out-right animations to Step 3 elements
         if (step3HeadingRef.current) step3HeadingRef.current.classList.add('slide-out-right');
         if (step3CardRef.current) step3CardRef.current.classList.add('slide-out-right-delay-1');
 
-        // Removed applying slide-in-left here, will do it after state update
-
-        // Increased timeout to match forward transitions
         setTimeout(() => {
-          // First update the state
           setShowThirdScreen(false);
-          setShowSecondScreen(true); // Show Step 2
+          setShowSecondScreen(true);
           setStep(2);
-          setAnimateProgress(false); // Stop progress animation
+          setAnimateProgress(false);
 
           // Reset Step 3 state ONLY
           setPrimaryColor('');
           setSecondaryColor('');
           setAccentColor('');
-          // DO NOT reset Step 2 state here
+          setActivePicker(null); // Close picker when going back
 
-          // Use a very short timeout to ensure DOM is updated before adding animation classes
-          setTimeout(() => {
-            // Apply slide-in-left animations AFTER Step 2 is shown and DOM is updated
+          requestAnimationFrame(() => {
             if (step2HeadingRef.current) {
-              step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-right'); // Clean up all classes
+              step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-right');
               step2HeadingRef.current.classList.add('slide-in-left');
             }
             if (step2FormContainerRef.current) {
-              step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-right-delay-1'); // Clean up all classes
+              step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-right-delay-1');
               step2FormContainerRef.current.classList.add('slide-in-left-delay-1');
             }
-          }, 20); // Very short delay to ensure DOM is updated
-        }, 400); // Increased to match forward transitions
+          });
+        }, 400);
 
       } else if (step === 2) { // Going back from Step 2 to Step 1
-        // Going back from Step 2 to Step 1
-        // Add slide-out-right animations to Step 2 elements
         if (step2HeadingRef.current) {
-          step2HeadingRef.current.classList.remove('slide-in-right', 'slide-in-left'); // Clean up entry classes
+          step2HeadingRef.current.classList.remove('slide-in-right', 'slide-in-left');
           step2HeadingRef.current.classList.add('slide-out-right');
         }
         if (step2FormContainerRef.current) {
@@ -137,46 +206,36 @@ export default function WelcomeOnboardingPage() {
           step2FormContainerRef.current.classList.add('slide-out-right-delay-1');
         }
 
-        // Removed applying slide-in-left here, will do it after state update
-
-        // Increased timeout to match forward transitions
         setTimeout(() => {
-          // First update the state
           setShowSecondScreen(false);
-          setShowFirstScreen(true); // Show Step 1
+          setShowFirstScreen(true);
           setStep(1);
           setAnimateProgress(false);
 
-          // Reset Step 2 state ONLY when going back to Step 1
           setCommunityName('');
           setIsNameChecked(false);
           setIsNameAvailable(false);
           setTownDescription('');
 
-          // Use a very short timeout to ensure DOM is updated before adding animation classes
-          setTimeout(() => {
-            // Apply slide-in-left animations AFTER Step 1 is shown and DOM is updated
+          requestAnimationFrame(() => {
             if (welcomeTextRef.current) {
-              welcomeTextRef.current.classList.remove('slide-out-left', 'slide-out-right'); // Clean up exit classes
-              welcomeTextRef.current.classList.add('slide-in-left'); // Apply entry
+              welcomeTextRef.current.classList.remove('slide-out-left', 'slide-out-right');
+              welcomeTextRef.current.classList.add('slide-in-left');
             }
             if (buttonsContainerRef.current) {
-              // Assuming buttons container uses delayed animation
-              buttonsContainerRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1'); // Clean up exit classes
-              buttonsContainerRef.current.classList.add('slide-in-left-delay-1'); // Apply entry
+              buttonsContainerRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1');
+              buttonsContainerRef.current.classList.add('slide-in-left-delay-1');
             }
-            // Clean up individual button refs if they also had exit animations applied directly
             if (createButtonRef.current) createButtonRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1');
             if (connectButtonRef.current) connectButtonRef.current.classList.remove('slide-out-left-delay-2', 'slide-out-right-delay-2');
-          }, 20); // Very short delay to ensure DOM is updated
-        }, 400); // Increased to match forward transitions
+          });
+        }, 400);
       }
     } else { // step === 1
-      // If on first screen, reset selection or log out
       if (selectedOption) {
-        setSelectedOption(null); // Deselect if going back from selection
+        setSelectedOption(null);
       } else {
-        logout(); // Log out if nothing selected yet
+        logout();
         router.replace('/login');
       }
     }
@@ -270,6 +329,40 @@ export default function WelcomeOnboardingPage() {
     }, 800);
   };
 
+  // Function to handle transition to Step 4
+  const transitionToStep4 = () => {
+    console.log('Transitioning to Step 4');
+    setActivePicker(null); // Close picker if open
+    setAnimateProgress(true); // Animate progress bar to step 4
+
+    // Add slide-out-left animations to Step 3 elements
+    if (step3HeadingRef.current) step3HeadingRef.current.classList.add('slide-out-left');
+    if (step3CardRef.current) step3CardRef.current.classList.add('slide-out-left-delay-1');
+
+    // Show Step 4 after animation delay
+    setTimeout(() => {
+      setShowThirdScreen(false);
+      setShowFourthScreen(true);
+      setStep(4);
+      setRecycleConfetti(true); // Start confetti
+      // Reset Step 4 state if needed (none currently)
+
+      // Programmatically add slide-in-right for Step 4 entry AFTER state update
+      requestAnimationFrame(() => {
+        if (step4HeadingRef.current) {
+          step4HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left'); // Clean up exit classes
+          step4HeadingRef.current.offsetHeight; // Force reflow
+          step4HeadingRef.current.classList.add('slide-in-right');
+        }
+      });
+      setAnimateProgress(false); // Reset animation trigger after timeout
+
+      // Stop confetti after a delay
+      setTimeout(() => setRecycleConfetti(false), 5000); // Stop after 5 seconds
+
+    }, 400); // Match animation duration
+  };
+
   // Handle next button click based on current step and selection
   const handleNext = () => {
     if (step === 1) {
@@ -311,38 +404,31 @@ export default function WelcomeOnboardingPage() {
           setSecondaryColor('');
           setAccentColor('');
 
-        // Programmatically add slide-in-right for Step 3 entry AFTER state update
-        requestAnimationFrame(() => {
-          if (step3HeadingRef.current) {
-            step3HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left'); // Clean up exit classes
-            step3HeadingRef.current.offsetHeight; // Force reflow
-            step3HeadingRef.current.classList.add('slide-in-right');
-          }
-          if (step3CardRef.current) {
-            step3CardRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1'); // Clean up exit classes
-            step3CardRef.current.offsetHeight; // Force reflow
-            step3CardRef.current.classList.add('slide-in-right-delay-1');
-          }
-        });
+        // Removed requestAnimationFrame block for Step 3 entry
         setAnimateProgress(false); // Reset animation trigger after timeout
       }, 400); // Match duration with Step 1->2
 
-      } else {
+    } else {
         alert('Please enter and validate an available town name.');
       }
     } else if (step === 3) {
       // Handle submission from Step 3 (Brand Colors)
       console.log('Brand colors:', { primaryColor, secondaryColor, accentColor });
-      alert('Brand colors submitted (not implemented). Proceeding to next step.');
-      // Example: router.push('/onboarding/final-step');
+      // Proceed to Step 4
+      transitionToStep4();
+    } else if (step === 4) {
+      // Handle final submission or navigation from Step 4
+      console.log('Onboarding complete!');
+      // Example: router.push('/dashboard');
+      alert('Onboarding complete! (Navigation not implemented)');
     }
   };
 
   // Helper function for hex color validation (basic)
   const isValidHex = (color: string): boolean => /^#[0-9A-F]{6}$/i.test(color) || /^#[0-9A-F]{3}$/i.test(color);
 
-  // Handle color input change
-  const handleColorChange = (colorSetter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle color input change (for text input)
+  const handleColorTextChange = (colorSetter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.toUpperCase();
     // Ensure '#' prefix and limit length
     if (!value.startsWith('#')) {
@@ -352,17 +438,28 @@ export default function WelcomeOnboardingPage() {
     colorSetter(value);
   };
 
+  // Handle color change from SketchPicker
+  const handleSketchPickerChange = (colorSetter: React.Dispatch<React.SetStateAction<string>>) => (color: ColorResult) => {
+    colorSetter(color.hex);
+  };
+
+
   // Determine if Next button should be disabled
   const isNextDisabled = () => {
-    if (step === 1 && !selectedOption) return true;
-    if (step === 2 && (!isNameChecked || !isNameAvailable)) return true;
-    // Add validation for step 3 if needed (e.g., require primary color)
-    // if (step === 3 && !isValidHex(primaryColor)) return true;
+    if (step === 1 && !selectedOption) return true; // Step 1: Must select an option
+    if (step === 2 && (!isNameChecked || !isNameAvailable)) return true; // Step 2: Must validate name
+    // Step 3: Must enter at least one valid color to enable Next (Skip bypasses this)
+    if (step === 3 && !isValidHex(primaryColor) && !isValidHex(secondaryColor) && !isValidHex(accentColor)) {
+      return true;
+    }
+    // Step 4: Always enabled (becomes "Finish")
     return false;
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 relative"> {/* Added relative positioning for confetti */}
+      {/* Conditionally render Confetti */}
+      {step === 4 && <Confetti recycle={recycleConfetti} numberOfPieces={200} />}
       {/* Card container */}
       <div className="w-full max-w-[814px] min-h-[500px] md:h-[738px] bg-[#111111] p-6 sm:p-8 md:p-10 flex flex-col relative border-[0.5px] border-white border-opacity-50 overflow-hidden card-entry-animation" style={{ fontFamily: 'var(--font-league-spartan)', display: 'flex', flexDirection: 'column', borderRadius: '30px' }}>
         {/* Header row with back button, logo and next button */}
@@ -403,7 +500,7 @@ export default function WelcomeOnboardingPage() {
               )}
               style={{ marginRight: '-10px', borderRadius: '9999px', paddingLeft: '24px', paddingRight: '24px', minWidth: '100px' }}
             >
-              Next
+              {step === 4 ? 'Finish' : 'Next'} {/* Change button text on last step */}
             </FrostedButton>
           </div>
         </div>
@@ -420,13 +517,13 @@ export default function WelcomeOnboardingPage() {
         {/* First Screen - Welcome */}
         {showFirstScreen && (
           <>
-            {/* Welcome text - positioned below progress bars */}
-            <div ref={welcomeTextRef} className="content-animation-2 welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
+            {/* Welcome text - Removed animation class and opacity from inline style */}
+            <div ref={welcomeTextRef} className="welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Hello! What would you like to do?</h1>
             </div>
 
-            {/* Selection buttons */}
-            <div ref={buttonsContainerRef} className="content-animation-3 buttons-container" style={{
+            {/* Selection buttons - Removed animation class and opacity from inline style */}
+            <div ref={buttonsContainerRef} className="buttons-container" style={{
               opacity: 0, // Start invisible
               display: 'flex',
               flexDirection: 'column',
@@ -450,7 +547,7 @@ export default function WelcomeOnboardingPage() {
                   width: '100%',
                   height: '110px',
                   borderRadius: '13px',
-                  border: '0.5px solid white',
+                  border: '0.5px solid rgba(255, 255, 255, 0.5)', // Match card border opacity
                   backgroundColor: 'transparent',
                   display: 'flex',
                   alignItems: 'center',
@@ -479,7 +576,7 @@ export default function WelcomeOnboardingPage() {
                   width: '100%',
                   height: '110px',
                   borderRadius: '13px',
-                  border: '0.5px solid white',
+                  border: '0.5px solid rgba(255, 255, 255, 0.5)', // Match card border opacity
                   backgroundColor: 'transparent',
                   display: 'flex',
                   alignItems: 'center',
@@ -619,7 +716,8 @@ export default function WelcomeOnboardingPage() {
 
               {/* Description Input - Conditionally rendered */}
               {isNameChecked && isNameAvailable && (
-                <div className="text-fade-in" style={{ marginTop: '20px', opacity: 0 }}>
+                 // Removed className="text-fade-in" from this container
+                <div style={{ marginTop: '20px' }}>
                   {/* Label and character count for description */}
                   <div style={{ marginBottom: '0.325px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <label className="text-white text-lg" style={{ fontFamily: 'League Spartan, sans-serif' }}>Describe your Town</label> {/* Changed capitalization */}
@@ -656,106 +754,170 @@ export default function WelcomeOnboardingPage() {
         {/* --- Third Screen - Brand Colors --- */}
         {showThirdScreen && (
           <>
-            {/* Heading - Added ref, removed hardcoded animation class */}
-            <div ref={step3HeadingRef} className="" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
+            {/* Heading - Added ref, RE-ADDED hardcoded animation class */}
+            <div ref={step3HeadingRef} className="slide-in-right" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px' }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Let's set up your brand colors next!</h1>
             </div>
 
-            {/* Color Palette Card - Added ref, removed hardcoded animation class, adjusted width */}
-            <div ref={step3CardRef} className="" style={{
-              opacity: 0, // Start invisible
-              marginTop: '40px', // Keep top margin
-              width: '387px', // Set exact width as requested
-              maxWidth: '100%', // Ensure it doesn't overflow on small screens
-              margin: '40px auto 0', // Center horizontally with auto margins
-              padding: '20px',
-              border: '0.5px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: '13px',
-              backgroundColor: 'transparent', // Match main card background
-            }}>
-              <p className="text-center text-lg mb-6" style={{ fontFamily: 'League Spartan, sans-serif' }}>Choose your color palette</p>
-
+            {/* Color Palette Card - Restored original structure */}
+            <div
+              ref={step3CardRef}
+              className="slide-in-right-delay-1" // Keep slide-in animation
+              style={{
+                marginTop: '40px', // Keep top margin
+                width: '387px', // Set exact width as requested
+                maxWidth: '100%', // Ensure it doesn't overflow on small screens
+                margin: '40px auto 0', // Center horizontally with auto margins
+                padding: '20px',
+                border: '0.5px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '13px',
+                backgroundColor: 'transparent', // Match main card background
+                position: 'relative' // Needed for absolute positioning of picker
+              }}
+            >
+              {/* Removed <p>Choose your color palette</p> */}
               <div className="space-y-[10px]"> {/* Set exact 10px spacing between bars */}
                 {/* Primary Color */}
-                <div className="flex items-center w-full">
-                  <div className="w-full rounded-md border border-white/30 flex items-center" style={{
-                    backgroundColor: isValidHex(primaryColor) ? primaryColor : 'transparent',
-                    height: '76px' // Increased height to 76px
-                  }}>
-                    {/* Color Picker Button - Now at the start */}
-                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
-                      {/* Teardrop Icon Placeholder */}
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                      </svg>
+                <div className="flex items-center w-full h-[76px] rounded-md border border-white/30 relative overflow-hidden"> {/* Outer container sets height/border */}
+                  {/* Background Color Element - Should be w-full */}
+                  <div className="absolute inset-0 w-full rounded-md" style={{ backgroundColor: isValidHex(primaryColor) ? primaryColor : 'transparent' }}></div>
+                  {/* Content (Button + Input) - Positioned above background */}
+                  <div className="relative z-10 flex items-center w-full h-full">
+                    <button
+                      type="button"
+                      data-picker-trigger // Add attribute to identify picker buttons
+                      onClick={() => setActivePicker(activePicker === 'primary' ? null : 'primary')}
+                      className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70 flex-shrink-0" style={{ margin: '0 12px' }}
+                    >
+                      <Image src="/images/DROP.svg" alt="Color picker" width={16} height={16} />
                     </button>
                     <input
                       type="text"
                       value={primaryColor}
-                      onChange={handleColorChange(setPrimaryColor)}
+                      onChange={handleColorTextChange(setPrimaryColor)}
                       maxLength={7}
                       placeholder="# Primary"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2 h-full" // Ensure input takes height
                     />
                   </div>
                 </div>
 
                 {/* Secondary Color */}
-                <div className="flex items-center w-full">
-                  {/* Middle length bar */}
-                  <div className="w-3/4 rounded-md border border-white/30 flex items-center" style={{
-                    backgroundColor: isValidHex(secondaryColor) ? secondaryColor : 'transparent',
-                    height: '76px' // Increased height to 76px
-                  }}>
-                    {/* Color Picker Button - Now at the start */}
-                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
-                      {/* Teardrop Icon Placeholder */}
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                      </svg>
+                <div className="flex items-center w-full h-[76px] rounded-md border border-white/30 relative overflow-hidden"> {/* Outer container */}
+                   {/* Background Color Element - Reverted to w-3/4 */}
+                   <div className="absolute inset-0 w-3/4 rounded-md" style={{ backgroundColor: isValidHex(secondaryColor) ? secondaryColor : 'transparent' }}></div>
+                   {/* Content (Button + Input) */}
+                   <div className="relative z-10 flex items-center w-full h-full">
+                    <button
+                      type="button"
+                      data-picker-trigger
+                      onClick={() => setActivePicker(activePicker === 'secondary' ? null : 'secondary')}
+                      className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70 flex-shrink-0" style={{ margin: '0 12px' }}
+                    >
+                       <Image src="/images/DROP.svg" alt="Color picker" width={16} height={16} />
                     </button>
                     <input
                       type="text"
                       value={secondaryColor}
-                      onChange={handleColorChange(setSecondaryColor)}
+                      onChange={handleColorTextChange(setSecondaryColor)}
                       maxLength={7}
                       placeholder="# Secondary"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2 h-full" // Ensure input takes height
                     />
-                  </div>
+                   </div>
                 </div>
 
                 {/* Accent Color */}
-                <div className="flex items-center w-full">
-                  {/* Shortest bar */}
-                  <div className="w-1/2 rounded-md border border-white/30 flex items-center" style={{
-                    backgroundColor: isValidHex(accentColor) ? accentColor : 'transparent',
-                    height: '76px' // Increased height to 76px
-                  }}>
-                    {/* Color Picker Button - Now at the start */}
-                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
-                      {/* Teardrop Icon Placeholder */}
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                      </svg>
+                <div className="flex items-center w-full h-[76px] rounded-md border border-white/30 relative overflow-hidden"> {/* Outer container */}
+                   {/* Background Color Element - Reverted to w-1/2 */}
+                   <div className="absolute inset-0 w-1/2 rounded-md" style={{ backgroundColor: isValidHex(accentColor) ? accentColor : 'transparent' }}></div>
+                   {/* Content (Button + Input) */}
+                   <div className="relative z-10 flex items-center w-full h-full">
+                    <button
+                      type="button"
+                      data-picker-trigger
+                      onClick={() => setActivePicker(activePicker === 'accent' ? null : 'accent')}
+                      className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70 flex-shrink-0" style={{ margin: '0 12px' }}
+                    >
+                       <Image src="/images/DROP.svg" alt="Color picker" width={16} height={16} />
                     </button>
                     <input
                       type="text"
                       value={accentColor}
-                      onChange={handleColorChange(setAccentColor)}
+                      onChange={handleColorTextChange(setAccentColor)}
                       maxLength={7}
                       placeholder="# Accent"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2 h-full" // Ensure input takes height
                     />
-                  </div>
+                   </div>
                 </div>
               </div>
+              {/* Shuffle and Skip Buttons */}
+              {/* Shuffle and Skip Buttons */}
+              <div className="flex justify-between items-center mt-6">
+                {/* Shuffle Button with Icon - Icon changed and moved to the right */}
+                <button className="flex items-center justify-center w-24 space-x-2 px-3 py-1 rounded border border-white/30 text-sm text-white/70 hover:text-white hover:border-white/50 transition-colors">
+                  <span>Shuffle</span>
+                  {/* Shuffle Icon SVG */}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                </button>
+                {/* Skip Button - Added fixed width and centering */}
+                <button
+                  type="button"
+                  onClick={transitionToStep4} // Call transition function on skip
+                  className="flex items-center justify-center w-24 px-3 py-1 rounded border border-white/30 text-sm text-white/70 hover:text-white hover:border-white/50 transition-colors"
+                >
+                  <span>Skip</span>
+                </button>
+              </div>
+              {/* Conditionally render SketchPicker Popup - Moved outside color bars, inside card */}
+              {activePicker === 'primary' && (
+                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                  <SketchPicker
+                    color={primaryColor || '#ffffff'}
+                    onChangeComplete={handleSketchPickerChange(setPrimaryColor)}
+                    disableAlpha={true}
+                    presetColors={[]}
+                  />
+                </div>
+              )}
+              {activePicker === 'secondary' && (
+                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                  <SketchPicker
+                    color={secondaryColor || '#ffffff'}
+                    onChangeComplete={handleSketchPickerChange(setSecondaryColor)}
+                    disableAlpha={true}
+                    presetColors={[]}
+                  />
+                </div>
+              )}
+              {activePicker === 'accent' && (
+                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                  <SketchPicker
+                    color={accentColor || '#ffffff'}
+                    onChangeComplete={handleSketchPickerChange(setAccentColor)}
+                    disableAlpha={true}
+                    presetColors={[]}
+                  />
+                </div>
+              )}
             </div>
           </>
         )}
+
+        {/* --- Fourth Screen - Congratulations --- */}
+        {showFourthScreen && (
+          <>
+            {/* Heading - Added ref */}
+            <div ref={step4HeadingRef} className="" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
+              <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Congratulations! You're all set.</h1>
+              {/* Add any other Step 4 content here */}
+            </div>
+          </>
+        )}
+
 
         {/* --- Spacer and User Info --- */}
         <div className="flex-grow"></div>

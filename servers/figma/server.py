@@ -11,8 +11,19 @@ import json
 import logging
 import asyncio
 import argparse
+import requests
 from typing import Dict, List, Optional, Any, Union
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+load_dotenv('.env.local')
+
+# Get Figma API token
+FIGMA_ACCESS_TOKEN = os.getenv('FIGMA_ACCESS_TOKEN')
+if not FIGMA_ACCESS_TOKEN:
+    logging.warning("FIGMA_ACCESS_TOKEN not found in environment variables. Using mock data.")
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -309,9 +320,30 @@ async def get_tools():
 async def get_file(request: GetFileRequest):
     """Get a Figma file by its key."""
     file_key = request.fileKey
-    
-    # In a real implementation, we would use the Figma API to get the file
-    # For now, we'll use mock data
+    access_token = request.accessToken or FIGMA_ACCESS_TOKEN
+
+    # If we have a Figma access token, use the real Figma API
+    if access_token:
+        try:
+            # Make a request to the Figma API
+            url = f"https://api.figma.com/v1/files/{file_key}"
+            headers = {"X-Figma-Token": access_token}
+            response = requests.get(url, headers=headers)
+
+            # Check if the request was successful
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "document": data.get("document", {}),
+                    "name": data.get("name", "Untitled")
+                }
+            else:
+                logger.error(f"Failed to get Figma file: {response.status_code} {response.text}")
+        except Exception as e:
+            logger.error(f"Error getting Figma file: {e}")
+
+    # Fall back to mock data if API call fails or no token is available
+    logger.info("Using mock data for Figma file")
     if file_key in MOCK_FILES:
         return {
             "document": MOCK_FILES[file_key]["document"],
@@ -325,7 +357,7 @@ async def get_file(request: GetFileRequest):
                     "document": file_data["document"],
                     "name": file_data["name"]
                 }
-        
+
         # If no file is found, return a 404
         raise HTTPException(status_code=404, detail=f"File '{file_key}' not found")
 
@@ -333,9 +365,40 @@ async def get_file(request: GetFileRequest):
 async def get_components(request: GetComponentsRequest):
     """Get components from a Figma file."""
     file_key = request.fileKey
-    
-    # In a real implementation, we would use the Figma API to get the components
-    # For now, we'll use mock data
+    access_token = request.accessToken or FIGMA_ACCESS_TOKEN
+
+    # If we have a Figma access token, use the real Figma API
+    if access_token:
+        try:
+            # Make a request to the Figma API to get components
+            url = f"https://api.figma.com/v1/files/{file_key}/components"
+            headers = {"X-Figma-Token": access_token}
+            response = requests.get(url, headers=headers)
+
+            # Check if the request was successful
+            if response.status_code == 200:
+                data = response.json()
+                components = []
+
+                # Process the components from the API response
+                for meta in data.get("meta", {}).get("components", []):
+                    component = {
+                        "id": meta.get("node_id", ""),
+                        "name": meta.get("name", "Unnamed Component"),
+                        "type": "COMPONENT",
+                        "description": meta.get("description", ""),
+                        "key": meta.get("key", ""),
+                    }
+                    components.append(component)
+
+                return {"components": components}
+            else:
+                logger.error(f"Failed to get Figma components: {response.status_code} {response.text}")
+        except Exception as e:
+            logger.error(f"Error getting Figma components: {e}")
+
+    # Fall back to mock data if API call fails or no token is available
+    logger.info("Using mock data for Figma components")
     if file_key in MOCK_COMPONENTS:
         return {"components": MOCK_COMPONENTS[file_key]}
     else:
@@ -343,7 +406,7 @@ async def get_components(request: GetComponentsRequest):
         for key, components in MOCK_COMPONENTS.items():
             if file_key.lower() in key.lower():
                 return {"components": components}
-        
+
         # If no file is found, return a 404
         raise HTTPException(status_code=404, detail=f"Components for file '{file_key}' not found")
 
@@ -351,9 +414,40 @@ async def get_components(request: GetComponentsRequest):
 async def get_styles(request: GetStylesRequest):
     """Get styles from a Figma file."""
     file_key = request.fileKey
-    
-    # In a real implementation, we would use the Figma API to get the styles
-    # For now, we'll use mock data
+    access_token = request.accessToken or FIGMA_ACCESS_TOKEN
+
+    # If we have a Figma access token, use the real Figma API
+    if access_token:
+        try:
+            # Make a request to the Figma API to get styles
+            url = f"https://api.figma.com/v1/files/{file_key}/styles"
+            headers = {"X-Figma-Token": access_token}
+            response = requests.get(url, headers=headers)
+
+            # Check if the request was successful
+            if response.status_code == 200:
+                data = response.json()
+                styles = []
+
+                # Process the styles from the API response
+                for meta in data.get("meta", {}).get("styles", []):
+                    style = {
+                        "id": meta.get("node_id", ""),
+                        "name": meta.get("name", "Unnamed Style"),
+                        "type": meta.get("style_type", "FILL").upper(),
+                        "description": "",
+                        "key": meta.get("key", ""),
+                    }
+                    styles.append(style)
+
+                return {"styles": styles}
+            else:
+                logger.error(f"Failed to get Figma styles: {response.status_code} {response.text}")
+        except Exception as e:
+            logger.error(f"Error getting Figma styles: {e}")
+
+    # Fall back to mock data if API call fails or no token is available
+    logger.info("Using mock data for Figma styles")
     if file_key in MOCK_STYLES:
         return {"styles": MOCK_STYLES[file_key]}
     else:
@@ -361,7 +455,7 @@ async def get_styles(request: GetStylesRequest):
         for key, styles in MOCK_STYLES.items():
             if file_key.lower() in key.lower():
                 return {"styles": styles}
-        
+
         # If no file is found, return a 404
         raise HTTPException(status_code=404, detail=f"Styles for file '{file_key}' not found")
 
@@ -378,6 +472,6 @@ def parse_args():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     args = parse_args()
     uvicorn.run(app, host=args.host, port=args.port)
