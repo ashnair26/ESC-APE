@@ -71,16 +71,18 @@ export default function WelcomeOnboardingPage() {
   // Effect to handle clicks outside the color picker
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (pickerContainerRef.current && !pickerContainerRef.current.contains(event.target as Node)) {
-         // Check if the click target is NOT one of the picker trigger buttons
-         const targetElement = event.target as Element;
-         if (!targetElement.closest('button[data-picker-trigger]')) {
-            setActivePicker(null);
-         }
+      const targetElement = event.target as Element;
+      // Check if the click is outside the picker container AND not on a trigger button
+      if (pickerContainerRef.current &&
+          !pickerContainerRef.current.contains(targetElement) &&
+          !targetElement.closest('button[data-picker-trigger]'))
+      {
+        setActivePicker(null);
       }
     };
 
     if (activePicker) {
+      // Revert to 'mousedown' without capture phase
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -517,14 +519,14 @@ export default function WelcomeOnboardingPage() {
         {/* First Screen - Welcome */}
         {showFirstScreen && (
           <>
-            {/* Welcome text - Removed animation class and opacity from inline style */}
-            <div ref={welcomeTextRef} className="welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px', opacity: 0 }}>
+            {/* Welcome text - Removed opacity: 0 from inline style */}
+            <div ref={welcomeTextRef} className="welcome-text" style={{ position: 'relative', marginTop: '40px', textAlign: 'center', padding: '0 20px' }}>
               <h1 className="font-normal" style={{ fontFamily: 'League Spartan, sans-serif', fontSize: 'clamp(24px, 5vw, 40px)' }}>Hello! What would you like to do?</h1>
             </div>
 
-            {/* Selection buttons - Removed animation class and opacity from inline style */}
+            {/* Selection buttons - Removed opacity: 0 from inline style */}
             <div ref={buttonsContainerRef} className="buttons-container" style={{
-              opacity: 0, // Start invisible
+              /* opacity: 0, */ // Removed start invisible style
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
@@ -872,34 +874,37 @@ export default function WelcomeOnboardingPage() {
                   <span>Skip</span>
                 </button>
               </div>
-              {/* Conditionally render SketchPicker Popup - Moved outside color bars, inside card */}
+              {/* Conditionally render SketchPicker Popup - Positioned to the right, using slide-in-right */}
               {activePicker === 'primary' && (
-                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}> {/* Adjust positioning */}
                   <SketchPicker
                     color={primaryColor || '#ffffff'}
                     onChangeComplete={handleSketchPickerChange(setPrimaryColor)}
-                    disableAlpha={true}
-                    presetColors={[]}
+                    disableAlpha={true} // Optional: disable alpha slider
+                    presetColors={[]} // Optional: remove preset colors
+                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
                   />
                 </div>
               )}
               {activePicker === 'secondary' && (
-                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}>
                   <SketchPicker
                     color={secondaryColor || '#ffffff'}
                     onChangeComplete={handleSketchPickerChange(setSecondaryColor)}
                     disableAlpha={true}
                     presetColors={[]}
+                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
                   />
                 </div>
               )}
               {activePicker === 'accent' && (
-                <div ref={pickerContainerRef} className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-t-lg color-picker-slide-up">
+                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}>
                   <SketchPicker
                     color={accentColor || '#ffffff'}
                     onChangeComplete={handleSketchPickerChange(setAccentColor)}
                     disableAlpha={true}
                     presetColors={[]}
+                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
                   />
                 </div>
               )}
