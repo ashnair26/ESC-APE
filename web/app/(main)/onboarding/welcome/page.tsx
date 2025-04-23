@@ -97,32 +97,33 @@ export default function WelcomeOnboardingPage() {
 
         // Removed applying slide-in-left here, will do it after state update
 
+        // Increased timeout to match forward transitions
         setTimeout(() => {
+          // First update the state
           setShowThirdScreen(false);
           setShowSecondScreen(true); // Show Step 2
           setStep(2);
           setAnimateProgress(false); // Stop progress animation
 
-        // Apply slide-in-left animations AFTER Step 2 is shown
-        requestAnimationFrame(() => {
-          if (step2HeadingRef.current) {
-            step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-right');
-            step2HeadingRef.current.offsetHeight; // Force reflow
-            step2HeadingRef.current.classList.add('slide-in-left');
-          }
-          if (step2FormContainerRef.current) {
-            step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-right-delay-1');
-            step2FormContainerRef.current.offsetHeight; // Force reflow
-            step2FormContainerRef.current.classList.add('slide-in-left-delay-1');
-          }
-        });
-
-        // Reset Step 3 state ONLY
+          // Reset Step 3 state ONLY
           setPrimaryColor('');
           setSecondaryColor('');
           setAccentColor('');
           // DO NOT reset Step 2 state here
-        }, 300); // Match animation duration
+
+          // Use a very short timeout to ensure DOM is updated before adding animation classes
+          setTimeout(() => {
+            // Apply slide-in-left animations AFTER Step 2 is shown and DOM is updated
+            if (step2HeadingRef.current) {
+              step2HeadingRef.current.classList.remove('slide-out-right', 'slide-out-left', 'slide-in-right'); // Clean up all classes
+              step2HeadingRef.current.classList.add('slide-in-left');
+            }
+            if (step2FormContainerRef.current) {
+              step2FormContainerRef.current.classList.remove('slide-out-right-delay-1', 'slide-out-left-delay-1', 'slide-in-right-delay-1'); // Clean up all classes
+              step2FormContainerRef.current.classList.add('slide-in-left-delay-1');
+            }
+          }, 20); // Very short delay to ensure DOM is updated
+        }, 400); // Increased to match forward transitions
 
       } else if (step === 2) { // Going back from Step 2 to Step 1
         // Going back from Step 2 to Step 1
@@ -138,36 +139,37 @@ export default function WelcomeOnboardingPage() {
 
         // Removed applying slide-in-left here, will do it after state update
 
+        // Increased timeout to match forward transitions
         setTimeout(() => {
+          // First update the state
           setShowSecondScreen(false);
           setShowFirstScreen(true); // Show Step 1
           setStep(1);
           setAnimateProgress(false);
-
-          // Apply slide-in-left animations AFTER Step 1 is shown
-          requestAnimationFrame(() => {
-            if (welcomeTextRef.current) {
-              welcomeTextRef.current.classList.remove('slide-out-left', 'slide-out-right'); // Clean up exit classes
-              welcomeTextRef.current.offsetHeight; // Force reflow
-              welcomeTextRef.current.classList.add('slide-in-left'); // Apply entry
-            }
-            if (buttonsContainerRef.current) {
-               // Assuming buttons container uses delayed animation
-               buttonsContainerRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1'); // Clean up exit classes
-               buttonsContainerRef.current.offsetHeight; // Force reflow
-               buttonsContainerRef.current.classList.add('slide-in-left-delay-1'); // Apply entry
-            }
-             // Clean up individual button refs if they also had exit animations applied directly
-            if (createButtonRef.current) createButtonRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1');
-            if (connectButtonRef.current) connectButtonRef.current.classList.remove('slide-out-left-delay-2', 'slide-out-right-delay-2');
-          });
 
           // Reset Step 2 state ONLY when going back to Step 1
           setCommunityName('');
           setIsNameChecked(false);
           setIsNameAvailable(false);
           setTownDescription('');
-        }, 300);
+
+          // Use a very short timeout to ensure DOM is updated before adding animation classes
+          setTimeout(() => {
+            // Apply slide-in-left animations AFTER Step 1 is shown and DOM is updated
+            if (welcomeTextRef.current) {
+              welcomeTextRef.current.classList.remove('slide-out-left', 'slide-out-right'); // Clean up exit classes
+              welcomeTextRef.current.classList.add('slide-in-left'); // Apply entry
+            }
+            if (buttonsContainerRef.current) {
+              // Assuming buttons container uses delayed animation
+              buttonsContainerRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1'); // Clean up exit classes
+              buttonsContainerRef.current.classList.add('slide-in-left-delay-1'); // Apply entry
+            }
+            // Clean up individual button refs if they also had exit animations applied directly
+            if (createButtonRef.current) createButtonRef.current.classList.remove('slide-out-left-delay-1', 'slide-out-right-delay-1');
+            if (connectButtonRef.current) connectButtonRef.current.classList.remove('slide-out-left-delay-2', 'slide-out-right-delay-2');
+          }, 20); // Very short delay to ensure DOM is updated
+        }, 400); // Increased to match forward transitions
       }
     } else { // step === 1
       // If on first screen, reset selection or log out
@@ -664,76 +666,91 @@ export default function WelcomeOnboardingPage() {
             <div ref={step3CardRef} className="" style={{
               opacity: 0, // Start invisible
               marginTop: '40px', // Keep top margin
-              width: '100%', // Allow it to fill container width
+              width: '387px', // Set exact width as requested
+              maxWidth: '100%', // Ensure it doesn't overflow on small screens
+              margin: '40px auto 0', // Center horizontally with auto margins
               padding: '20px',
               border: '0.5px solid rgba(255, 255, 255, 0.3)',
               borderRadius: '13px',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: 'transparent', // Match main card background
             }}>
               <p className="text-center text-lg mb-6" style={{ fontFamily: 'League Spartan, sans-serif' }}>Choose your color palette</p>
 
-              <div className="space-y-4">
+              <div className="space-y-[10px]"> {/* Set exact 10px spacing between bars */}
                 {/* Primary Color */}
-                <div className="flex items-center space-x-3">
-                  <div className="flex-1 h-10 rounded-md border border-white/30 flex items-center pr-2" style={{ backgroundColor: isValidHex(primaryColor) ? primaryColor : 'transparent' }}>
-                    <input
-                      type="text"
-                      value={primaryColor}
-                      onChange={handleColorChange(setPrimaryColor)}
-                      maxLength={7}
-                      placeholder="# Primary"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-3 py-2"
-                    />
-                    {/* Placeholder for Color Picker */}
-                    <button className="w-6 h-6 rounded border border-white/50 flex items-center justify-center text-white/70">
+                <div className="flex items-center w-full">
+                  <div className="w-full rounded-md border border-white/30 flex items-center" style={{
+                    backgroundColor: isValidHex(primaryColor) ? primaryColor : 'transparent',
+                    height: '76px' // Increased height to 76px
+                  }}>
+                    {/* Color Picker Button - Now at the start */}
+                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
                       {/* Teardrop Icon Placeholder */}
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                       </svg>
                     </button>
+                    <input
+                      type="text"
+                      value={primaryColor}
+                      onChange={handleColorChange(setPrimaryColor)}
+                      maxLength={7}
+                      placeholder="# Primary"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
+                    />
                   </div>
                 </div>
 
                 {/* Secondary Color */}
-                <div className="flex items-center space-x-3">
-                  {/* Changed w-3/4 to flex-1 */}
-                  <div className="flex-1 h-10 rounded-md border border-white/30 flex items-center pr-2" style={{ backgroundColor: isValidHex(secondaryColor) ? secondaryColor : 'transparent' }}>
+                <div className="flex items-center w-full">
+                  {/* Middle length bar */}
+                  <div className="w-3/4 rounded-md border border-white/30 flex items-center" style={{
+                    backgroundColor: isValidHex(secondaryColor) ? secondaryColor : 'transparent',
+                    height: '76px' // Increased height to 76px
+                  }}>
+                    {/* Color Picker Button - Now at the start */}
+                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
+                      {/* Teardrop Icon Placeholder */}
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      </svg>
+                    </button>
                     <input
                       type="text"
                       value={secondaryColor}
                       onChange={handleColorChange(setSecondaryColor)}
                       maxLength={7}
                       placeholder="# Secondary"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-3 py-2"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
                     />
-                    <button className="w-6 h-6 rounded border border-white/50 flex items-center justify-center text-white/70">
+                  </div>
+                </div>
+
+                {/* Accent Color */}
+                <div className="flex items-center w-full">
+                  {/* Shortest bar */}
+                  <div className="w-1/2 rounded-md border border-white/30 flex items-center" style={{
+                    backgroundColor: isValidHex(accentColor) ? accentColor : 'transparent',
+                    height: '76px' // Increased height to 76px
+                  }}>
+                    {/* Color Picker Button - Now at the start */}
+                    <button className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70" style={{ margin: '0 12px' }}>
+                      {/* Teardrop Icon Placeholder */}
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                       </svg>
                     </button>
-                  </div>
-                </div>
-
-                {/* Accent Color */}
-                <div className="flex items-center space-x-3">
-                  {/* Changed w-1/2 to flex-1 */}
-                  <div className="flex-1 h-10 rounded-md border border-white/30 flex items-center pr-2" style={{ backgroundColor: isValidHex(accentColor) ? accentColor : 'transparent' }}>
                     <input
                       type="text"
                       value={accentColor}
                       onChange={handleColorChange(setAccentColor)}
                       maxLength={7}
                       placeholder="# Accent"
-                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-3 py-2"
+                      className="flex-grow bg-transparent border-none focus:ring-0 text-white placeholder-white/50 px-2 py-2"
                     />
-                    <button className="w-6 h-6 rounded border border-white/50 flex items-center justify-center text-white/70">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v11.25a1.5 1.5 0 0 1-1.5 1.5h-1.5a1.5 1.5 0 0 1-1.5-1.5V5.25a1.5 1.5 0 0 1 1.5-1.5h1.5Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12.75a4.5 4.5 0 0 0-4.5-4.5m4.5 4.5a4.5 4.5 0 0 1-4.5 4.5M15 12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
               </div>
