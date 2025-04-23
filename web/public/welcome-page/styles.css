@@ -1,0 +1,214 @@
+/* Base styles */
+:root {
+  --primary-color: #C20023;
+  --primary-hover: #A10018;
+  --background-color: #000000;
+  --card-background: #111111;
+  --card-border: #333333;
+  --text-primary: #FFFFFF;
+  --text-secondary: #AAAAAA;
+  --disabled-color: #666666;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Progress indicator */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  width: 200px;
+  margin-bottom: 1rem;
+}
+
+.progress-step {
+  width: 40px;
+  height: 4px;
+  background-color: var(--card-border);
+  margin: 0 4px;
+  border-radius: 2px;
+}
+
+.progress-step.active {
+  background-color: var(--primary-color);
+}
+
+.progress-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Logo */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.logo {
+  height: 80px;
+}
+
+/* Welcome text */
+.welcome-text {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.welcome-text h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.welcome-text p {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+}
+
+/* Options */
+.options-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.option-card {
+  background-color: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.option-card.active:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.option-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.option-content {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.option-icon {
+  margin-bottom: 2rem;
+}
+
+.option-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.option-content p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.option-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--card-border);
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--disabled-color);
+  color: var(--disabled-color);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  text-align: center;
+}
+
+.user-info {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .options-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcome-text h1 {
+    font-size: 2.5rem;
+  }
+  
+  .welcome-text p {
+    font-size: 1.25rem;
+  }
+}

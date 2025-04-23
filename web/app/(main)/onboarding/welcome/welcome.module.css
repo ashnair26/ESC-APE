@@ -1,0 +1,190 @@
+/* Base styles */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+/* Progress indicator */
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.progressBar {
+  display: flex;
+  justify-content: center;
+  width: 200px;
+  margin-bottom: 1rem;
+}
+
+.progressStep {
+  width: 40px;
+  height: 4px;
+  background-color: #333333;
+  margin: 0 4px;
+  border-radius: 2px;
+}
+
+.progressStepActive {
+  background-color: #C20023;
+}
+
+.progressText {
+  font-size: 14px;
+  color: #AAAAAA;
+}
+
+/* Logo */
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.logo {
+  height: 80px;
+}
+
+/* Welcome text */
+.welcomeText {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.welcomeTitle {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #FFFFFF;
+}
+
+.welcomeSubtitle {
+  font-size: 1.5rem;
+  color: #AAAAAA;
+}
+
+/* Options */
+.optionsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.optionCard {
+  background-color: #111111;
+  border: 1px solid #333333;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.optionCardActive:hover {
+  transform: translateY(-8px);
+  border-color: #C20023;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(194, 0, 35, 0.2);
+}
+
+.optionCardDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.optionContent {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.optionIcon {
+  margin-bottom: 2rem;
+}
+
+.optionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #FFFFFF;
+}
+
+.optionDescription {
+  font-size: 1rem;
+  color: #AAAAAA;
+}
+
+.optionFooter {
+  padding: 1.5rem;
+  border-top: 1px solid #333333;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.btnPrimary {
+  background-color: #C20023;
+  color: white;
+}
+
+.btnPrimary:hover {
+  background-color: #A10018;
+}
+
+.btnSecondary {
+  background-color: transparent;
+  border: 1px solid #666666;
+  color: #666666;
+}
+
+.btnDisabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  text-align: center;
+}
+
+.userInfo {
+  font-size: 0.875rem;
+  color: #AAAAAA;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .optionsContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcomeTitle {
+    font-size: 2.5rem;
+  }
+  
+  .welcomeSubtitle {
+    font-size: 1.25rem;
+  }
+}
