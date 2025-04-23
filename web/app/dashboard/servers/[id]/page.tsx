@@ -46,7 +46,7 @@ export default function ServerDetailPage() {
       sanity: 8007,
       base: 8008,
       context7: 8009,
-      figma: 8010
+      figma: 3333
     };
 
     const port = serverPorts[id];

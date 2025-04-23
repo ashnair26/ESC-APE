@@ -10,7 +10,7 @@
 export async function checkServerStatus(url: string): Promise<boolean> {
   try {
     // For Context7 and Figma servers, actually check if they're running
-    if (url.includes('8009') || url.includes('8010')) {
+    if (url.includes('8009') || url.includes('3333')) {
       // Add a timeout to the fetch request to avoid long waits
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -35,7 +35,7 @@ export async function checkServerStatus(url: string): Promise<boolean> {
     console.error(`Error checking server status for ${url}:`, error);
 
     // For non-Context7/Figma servers, return true anyway to show them as online
-    if (!url.includes('8009') && !url.includes('8010')) {
+    if (!url.includes('8009') && !url.includes('3333')) {
       return true;
     }
 
@@ -51,7 +51,7 @@ export async function checkServerStatus(url: string): Promise<boolean> {
 export async function getServerTools(url: string): Promise<number> {
   try {
     // For Context7 and Figma servers, actually check the tools
-    if (url.includes('8009') || url.includes('8010')) {
+    if (url.includes('8009') || url.includes('3333')) {
       // Add a timeout to the fetch request to avoid long waits
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -87,7 +87,7 @@ export async function getServerTools(url: string): Promise<number> {
     // If there's an error, return mock tool counts for non-Context7/Figma servers
     console.error(`Error getting tools for ${url}:`, error);
 
-    if (!url.includes('8009') && !url.includes('8010')) {
+    if (!url.includes('8009') && !url.includes('3333')) {
       if (url.includes('8000')) return 7; // Unified server
       if (url.includes('8004')) return 2; // Git server
       if (url.includes('8005')) return 2; // Privy server

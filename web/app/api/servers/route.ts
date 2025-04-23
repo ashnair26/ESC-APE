@@ -11,7 +11,7 @@ const MCP_SERVERS: Record<string, string> = {
     sanity: 'http://localhost:8007',
     base: 'http://localhost:8008',
     context7: 'http://localhost:8009',
-    figma: 'http://localhost:8010',
+    figma: 'http://localhost:3333',
 };
 
 export async function GET(request: NextRequest) {
