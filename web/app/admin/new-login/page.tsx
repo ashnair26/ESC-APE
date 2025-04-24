@@ -22,7 +22,7 @@ export default function NewAdminLoginPage() {
         console.log('Authentication status:', isAuthenticated);
         if (isAuthenticated) {
           console.log('User is authenticated, redirecting to dashboard...');
-          router.push('/admin/dashboard');
+          router.push('/dashboard');
         }
       } catch (err) {
         console.error('Error checking authentication:', err);
@@ -45,7 +45,7 @@ export default function NewAdminLoginPage() {
 
       if (result.success) {
         console.log('Login successful, redirecting to dashboard...');
-        router.push('/admin/dashboard');
+        router.push('/dashboard');
       } else {
         console.log('Login failed:', result.error);
         setError(result.error || 'Login failed');
