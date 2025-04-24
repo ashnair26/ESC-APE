@@ -1,0 +1,24 @@
+/* CreatorHub Styles */
+
+/* Override the pill background color to #c20023 */
+div[class*="absolute left-0 top-1.5"] {
+  background-color: #c20023 !important;
+}
+
+/* Make sure text is properly styled */
+button[class*="relative z-10 rounded-full"] {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 500;
+}
+
+/* Style for active button text */
+button[class*="text-white"] {
+  font-weight: 600 !important;
+}
+
+/* Style the navbar background for dark mode */
+div[class*="relative flex items-center justify-between rounded-full"] {
+  background-color: rgba(24, 24, 24, 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
