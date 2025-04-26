@@ -82,7 +82,7 @@ export default function DashboardPage() {
           // Try to check auth one more time
           const isAuthenticated = await checkAuth();
           if (!isAuthenticated) {
-            router.push('/admin-login');
+            router.push('/admin/login');
           }
         }
       }
@@ -95,7 +95,7 @@ export default function DashboardPage() {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.push('/admin-login');
+      router.push('/admin/login');
     } catch (err) {
       console.error('Logout error:', err);
     } finally {

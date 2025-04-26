@@ -1,0 +1,40 @@
+/* Styles to customize the UI Components Navbar */
+
+/* Override the pill color to #c20023 */
+.creatorhub-navbar div[class*="absolute left-0"],
+.creatorhub-navbar div[class*="bg-primary-600"],
+.creatorhub-navbar div[class*="bg-secondary-600"],
+.creatorhub-navbar div[class*="bg-accent-600"],
+.creatorhub-navbar div[class*="transition-all duration-300"] {
+  background-color: #c20023 !important;
+}
+
+/* Match the card outline style and remove container outline */
+.creatorhub-navbar > div {
+  border: none !important; /* Remove container border */
+  background: transparent !important; /* Make container background transparent */
+  box-shadow: none !important; /* Remove any shadow */
+}
+
+/* Apply card outline style directly to the navbar */
+.creatorhub-navbar div[class*="rounded-full"][class*="bg-white"],
+.creatorhub-navbar div[class*="rounded-full"][class*="bg-[#181818]"],
+.creatorhub-navbar div[class*="rounded-full"][class*="p-1.5"] {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure text is properly centered */
+.creatorhub-navbar button {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Style for active link text */
+.creatorhub-navbar button[class*="text-white"] {
+  font-weight: 500 !important;
+}

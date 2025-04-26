@@ -6,9 +6,7 @@ import { useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { FrostedButton } from '@/components/ui/FrostedButton';
-import ParticleBackground from '@/components/ui/ParticleBackground';
 import './login-animations.css';
-import { setupPrivyAnimations } from './privy-animations';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,10 +15,7 @@ export default function LoginPage() {
   // Log Privy state changes
   console.log(`[Login Page] Privy State: ready=${ready}, authenticated=${authenticated}`);
 
-  // Set up Privy animations
-  useEffect(() => {
-    setupPrivyAnimations();
-  }, []);
+  // No animation setup needed
 
   // Redirect logic:
   // - If authenticated, redirect immediately to /auth-check for verification & routing.
@@ -45,7 +40,6 @@ export default function LoginPage() {
   // If ready and not authenticated, show the login page content
   return (
     <div className="min-h-screen flex flex-col login-container bg-black text-white relative overflow-hidden">
-      <ParticleBackground />
       {/* Navbar-style header */}
       <header className="w-full py-4 px-6 flex justify-between items-center bg-black bg-opacity-20 backdrop-blur-sm z-10">
         {/* Logo on the left */}

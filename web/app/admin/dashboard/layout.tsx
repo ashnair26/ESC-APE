@@ -18,17 +18,18 @@ import {
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
+import './admin-dashboard-styles.css';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: ServerIcon },
-  { name: 'MCP Servers', href: '/dashboard/servers', icon: ServerIcon },
-  { name: 'Tools', href: '/dashboard/tools', icon: CommandLineIcon },
-  { name: 'Secrets', href: '/dashboard/secrets', icon: KeyIcon },
-  { name: 'API Settings', href: '/dashboard/settings', icon: CogIcon },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: ServerIcon },
+  { name: 'MCP Servers', href: '/admin/dashboard/servers', icon: ServerIcon },
+  { name: 'Tools', href: '/admin/dashboard/tools', icon: CommandLineIcon },
+  { name: 'Secrets', href: '/admin/dashboard/secrets', icon: KeyIcon },
+  { name: 'API Settings', href: '/admin/dashboard/settings', icon: CogIcon },
   { name: 'UI Components', href: '/components', icon: SwatchIcon },
 ];
 
-export default function DashboardLayout({
+export default function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -36,10 +37,6 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  // Note: Removed checkAuth as it's not used when auth check is disabled
-  // Note: Re-added checkAuth dependency if needed by the original logic, but keeping the simplified effect for now.
-  // Note: checkAuth not needed when client-side check is disabled
-  // Re-adding checkAuth as it might be needed by other parts, though the effect below doesn't use it directly.
   const { user, logout, loading, checkAuth } = useAuth();
 
   // Re-enabled client-side auth check
@@ -49,11 +46,11 @@ export default function DashboardLayout({
     if (!loading) {
       // If loading is done and there's no user object, redirect.
       if (!user) {
-        console.log('DashboardLayout: Initial load complete, user is null. Redirecting.');
-        router.push('/admin-login');
+        console.log('AdminDashboardLayout: Initial load complete, user is null. Redirecting.');
+        router.push('/admin/login');
       } else {
         // User is authenticated and loading is done. Allow access.
-        console.log('DashboardLayout: Initial load complete, user found:', user.email);
+        console.log('AdminDashboardLayout: Initial load complete, user found:', user.email);
       }
     }
     // Depend only on user and loading state from the context.
@@ -233,6 +230,38 @@ export default function DashboardLayout({
             className="h-6 w-px bg-gray-200 lg:hidden dark:bg-gray-700"
             aria-hidden="true"
           />
+
+          {/* Admin Navbar - Matching UI Dashboard style */}
+          <div className="admin-navbar flex-1 flex justify-center mx-4 hidden lg:flex">
+            <div className="w-full max-w-3xl">
+              <nav className="relative flex items-center justify-between rounded-full p-1.5 shadow border border-opacity-10">
+                {/* Sliding indicator - Using exact dimensions from UI Dashboard */}
+                <div
+                  className="pill-indicator absolute rounded-full transition-all duration-300 ease-in-out z-0"
+                  style={{
+                    left: `${navigation.findIndex(item => pathname === item.href) * (100 / navigation.length)}%`,
+                    width: `${100 / navigation.length}%`,
+                  }}
+                />
+
+                {/* Navigation items */}
+                {navigation.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={clsx(
+                      'rounded-full transition-colors',
+                      pathname === item.href
+                        ? 'text-white active'
+                        : 'text-gray-400 hover:text-gray-200'
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </div>
 
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex-1" />

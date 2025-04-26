@@ -16,7 +16,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [mode, setMode] = useState<'request' | 'reset'>('request');
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
       if (response.ok) {
         setSuccess('Password has been reset successfully. You can now log in with your new password.');
         setTimeout(() => {
-          router.push('/admin/login');
+          router.push('/admin-login');
         }, 3000);
       } else {
         throw new Error(data.error || 'Failed to reset password');
@@ -109,36 +109,36 @@ export default function ResetPasswordPage() {
       <div className="max-w-md w-full space-y-4 p-8 rounded-xl shadow-md" style={{ backgroundColor: '#010101' }}>
         <div className="flex flex-col items-center space-y-0 mb-2">
           <div className="w-36 h-36 relative">
-            <Image 
-              src="/images/logos/ESCAPE_logo_2.png" 
-              alt="ESCAPE Logo 2" 
+            <Image
+              src="/images/logos/ESCAPE_logo_2.png"
+              alt="ESCAPE Logo 2"
               fill
               priority
               className="object-contain"
             />
           </div>
           <div className="w-36 h-36 relative">
-            <Image 
-              src="/images/logos/ESCAPE_logo_1.png" 
-              alt="ESCAPE Logo 1" 
+            <Image
+              src="/images/logos/ESCAPE_logo_1.png"
+              alt="ESCAPE Logo 1"
               fill
               priority
               className="object-contain"
             />
           </div>
         </div>
-        
+
         <div>
           <h2 className="mt-2 text-center text-3xl font-extrabold text-white">
             {mode === 'request' ? 'RESET PASSWORD' : 'NEW PASSWORD'}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-300">
-            {mode === 'request' 
-              ? 'Enter your email to receive a password reset link' 
+            {mode === 'request'
+              ? 'Enter your email to receive a password reset link'
               : 'Enter your new password'}
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-900/30 border border-red-800 text-red-200 px-4 py-3 rounded relative" role="alert">
             <span className="block sm:inline">{error}</span>
@@ -150,7 +150,7 @@ export default function ResetPasswordPage() {
             <span className="block sm:inline">{success}</span>
           </div>
         )}
-        
+
         {mode === 'request' ? (
           <form className="mt-4 space-y-4" onSubmit={handleRequestReset}>
             <div>
@@ -182,8 +182,8 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="text-center">
-              <a 
-                href="/admin/login" 
+              <a
+                href="/admin/login"
                 className="text-sm text-gray-300 hover:text-white"
               >
                 Back to login
@@ -251,8 +251,8 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="text-center">
-              <a 
-                href="/admin/login" 
+              <a
+                href="/admin/login"
                 className="text-sm text-gray-300 hover:text-white"
               >
                 Back to login

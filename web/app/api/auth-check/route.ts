@@ -74,7 +74,23 @@ export async function POST(req: NextRequest) {
     // Implement Routing Logic based on PLANNING.md
     // Check user roles and redirect accordingly
 
-    // 3. Check if Creator
+    // 3. Check if Admin
+    const { data: adminData, error: adminError } = await supabaseAdmin
+      .from('admins')
+      .select('id')
+      .eq('privy_id', privyUserId)
+      .maybeSingle();
+
+    if (adminError) {
+      console.error('[Auth Check] Error checking admin status:', adminError);
+    }
+
+    if (adminData) {
+      console.log('[Auth Check] User is an Admin. Redirecting to admin dashboard.');
+      return NextResponse.json({ redirect: '/dashboard' });
+    }
+
+    // 4. Check if Creator
     const { data: creatorData, error: creatorError } = await supabaseAdmin
       .from('creators')
       .select('id, community_id')
@@ -90,7 +106,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ redirect: '/creator-dashboard' });
     }
 
-    // 4. Check if Member
+    // 5. Check if Member
     const { data: memberData, error: memberError } = await supabaseAdmin
       .from('community_members')
       .select('community:communities(slug)')
@@ -107,7 +123,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ redirect: `/community/${memberData.community.slug}` });
     }
 
-    // 5. New User - Redirect to Onboarding
+    // 6. New User - Redirect to Onboarding
     console.log('[Auth Check] New user or no specific role found. Redirecting to onboarding.');
     return NextResponse.json({ redirect: '/onboarding/welcome' });
 

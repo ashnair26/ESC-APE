@@ -12,6 +12,7 @@ const JWT_SECRET_UINT8ARRAY = new TextEncoder().encode(JWT_SECRET_STRING);
 const PROTECTED_PATHS = [
   '/dashboard', // Dashboard routes require authentication
   '/api/admin',
+  '/creatorhub', // CreatorHub routes require authentication
 ];
 
 // Paths that are exempt from authentication
@@ -23,6 +24,9 @@ const EXEMPT_PATHS = [
 
 // Paths that are exempt from authentication
 const PUBLIC_PATHS = [
+  '/login', // Add the main login page
+  '/auth-check', // Add the auth-check page
+  '/onboarding', // Add the onboarding path
   '/admin/login',
   '/admin/reset-password',
   '/admin/simple-login',
@@ -39,12 +43,19 @@ const PUBLIC_PATHS = [
   '/api/admin/auth/user',
   '/api/admin/auth/cookie-test',
   '/api/admin/auth/logout',
+  '/api/auth-check', // Add the auth-check API
   '/_next',
   '/favicon.ico',
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // IMPORTANT: Completely bypass middleware for admin routes and dashboard
+  if (pathname.startsWith('/admin') || pathname === '/dashboard') {
+    console.log(`Middleware: Bypassing all checks for admin route: ${pathname}`);
+    return NextResponse.next();
+  }
 
   // Check if the path is exempt from authentication
   const isExemptPath = EXEMPT_PATHS.some(path => pathname === path);
@@ -63,12 +74,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get the token from the cookie
+  // Check if this is a CreatorHub route
+  const isCreatorHubPath = pathname.startsWith('/creatorhub');
+
+  if (isCreatorHubPath) {
+    // For CreatorHub routes, check for Privy token
+    const privyToken = request.cookies.get('privy-token')?.value;
+
+    // If there's no Privy token, redirect to login
+    if (!privyToken) {
+      console.log(`Middleware: No Privy token found for CreatorHub path ${pathname}. Redirecting to login.`);
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // Allow access to CreatorHub routes if Privy token exists
+    return NextResponse.next();
+  }
+
+  // Check if this is a regular user path (not admin)
+  if (!pathname.startsWith('/admin')) {
+    // For non-admin routes, redirect to the main login page
+    console.log(`Middleware: Non-admin path ${pathname} without auth. Redirecting to main login.`);
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // For admin routes, check for admin token
   const token = request.cookies.get('admin_token')?.value;
 
-  // If there's no token, redirect to login
+  // If there's no token, redirect to admin login
   if (!token) {
-    // console.log(`Middleware: No token found for protected path ${pathname}. Redirecting to login.`);
+    // console.log(`Middleware: No token found for protected admin path ${pathname}. Redirecting to admin login.`);
     const url = new URL('/admin/login', request.url);
     url.searchParams.set('from', pathname);
     return NextResponse.redirect(url);

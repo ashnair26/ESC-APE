@@ -1,0 +1,44 @@
+/* Admin Dashboard Navbar Styles - Matching UI Dashboard */
+
+/* Style for navbar links */
+.admin-navbar a {
+  font-family: 'League Spartan', sans-serif !important;
+  font-weight: 400 !important; /* Regular weight */
+  text-transform: none !important; /* Ensure text is not transformed to uppercase */
+  font-size: 14px !important; /* Match UI Dashboard font size */
+  letter-spacing: 0.02em !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 32px !important; /* Fixed height to match UI Dashboard */
+}
+
+/* Style for active link text */
+.admin-navbar a.active {
+  font-weight: 500 !important; /* Medium weight for active items */
+}
+
+/* Style the navbar background */
+.admin-navbar nav {
+  background-color: rgba(24, 24, 24, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  height: 40px !important; /* Fixed height to match UI Dashboard */
+}
+
+/* Style the pill indicator */
+.admin-navbar .pill-indicator {
+  background-color: #c20023 !important;
+  border-radius: 9999px !important;
+  height: 32px !important;
+  /* Center the pill vertically */
+  top: 4px !important;
+}
+
+/* Ensure text is centered in the pill */
+.admin-navbar a {
+  position: relative !important;
+  z-index: 10 !important;
+  padding: 0 16px !important; /* Consistent padding */
+  margin: 0 2px !important; /* Small margin between items */
+  white-space: nowrap !important;
+}

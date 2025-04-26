@@ -18,8 +18,8 @@ export default function AdminLoginPage() {
   useEffect(() => {
     // Don't redirect while the context is still performing its initial load
     if (!authLoading && user) {
-      console.log('Login Page: Auth context loaded and user found, redirecting to dashboard.');
-      router.push('/dashboard');
+      console.log('Login Page: Auth context loaded and user found, redirecting to admin dashboard.');
+      router.push('/admin/dashboard');
     }
   }, [user, authLoading, router]);
 

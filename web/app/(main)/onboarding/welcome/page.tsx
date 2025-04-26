@@ -4,12 +4,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Confetti from 'react-confetti';
-import { SketchPicker, ColorResult } from 'react-color'; // Import SketchPicker and ColorResult type
+// No longer need to import from react-color directly
 import clsx from 'clsx';
 import { usePrivy } from '@privy-io/react-auth';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import { FrostedButton } from '@/components/ui/FrostedButton';
+import ColorPickerPopover from '@/components/ui/ColorPickerPopover';
 import './hover-styles.css';
 
 export default function WelcomeOnboardingPage() {
@@ -33,7 +34,7 @@ export default function WelcomeOnboardingPage() {
   const [accentColor, setAccentColor] = useState('');
   const [showFourthScreen, setShowFourthScreen] = useState(false); // State for step 4 visibility
   const [recycleConfetti, setRecycleConfetti] = useState(true); // State for confetti
-  const [activePicker, setActivePicker] = useState<'primary' | 'secondary' | 'accent' | null>(null); // Re-add state for active picker
+  const [activePicker, setActivePicker] = useState<string | null>(null); // State for active picker
 
   // Refs for animation elements
   const welcomeTextRef = useRef<HTMLDivElement>(null);
@@ -48,7 +49,6 @@ export default function WelcomeOnboardingPage() {
   const step3CardRef = useRef<HTMLDivElement>(null);
   // Refs for Step 4 elements
   const step4HeadingRef = useRef<HTMLDivElement>(null);
-  const pickerContainerRef = useRef<HTMLDivElement>(null); // Ref for picker container
 
 
   // Reset form state when component unmounts
@@ -68,30 +68,10 @@ export default function WelcomeOnboardingPage() {
     };
   }, []);
 
-  // Effect to handle clicks outside the color picker
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const targetElement = event.target as Element;
-      // Check if the click is outside the picker container AND not on a trigger button
-      if (pickerContainerRef.current &&
-          !pickerContainerRef.current.contains(targetElement) &&
-          !targetElement.closest('button[data-picker-trigger]'))
-      {
-        setActivePicker(null);
-      }
-    };
-
-    if (activePicker) {
-      // Revert to 'mousedown' without capture phase
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [activePicker]); // Re-run if activePicker changes
+  // Create refs for color picker buttons
+  const primaryColorButtonRef = useRef<HTMLButtonElement>(null);
+  const secondaryColorButtonRef = useRef<HTMLButtonElement>(null);
+  const accentColorButtonRef = useRef<HTMLButtonElement>(null);
 
   // Effect to trigger initial Step 1 animations on mount
   useEffect(() => {
@@ -420,9 +400,25 @@ export default function WelcomeOnboardingPage() {
       transitionToStep4();
     } else if (step === 4) {
       // Handle final submission or navigation from Step 4
-      console.log('Onboarding complete!');
-      // Example: router.push('/dashboard');
-      alert('Onboarding complete! (Navigation not implemented)');
+      console.log('Onboarding complete! Navigating to creator hub...');
+
+      // Set a flag in localStorage to indicate onboarding is complete
+      localStorage.setItem('onboardingComplete', 'true');
+
+      // Make an auth check request with the onboarding complete header
+      fetch('/api/auth-check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Onboarding-Complete': 'true'
+        },
+        body: JSON.stringify({ token: localStorage.getItem('privy-token') })
+      }).catch(error => {
+        console.error('Error updating auth status:', error);
+      });
+
+      // Navigate to the CreatorHub
+      router.push('/creatorhub');
     }
   };
 
@@ -440,10 +436,7 @@ export default function WelcomeOnboardingPage() {
     colorSetter(value);
   };
 
-  // Handle color change from SketchPicker
-  const handleSketchPickerChange = (colorSetter: React.Dispatch<React.SetStateAction<string>>) => (color: ColorResult) => {
-    colorSetter(color.hex);
-  };
+  // Color picker is now handled by the ColorPickerPopover component
 
 
   // Determine if Next button should be disabled
@@ -786,8 +779,9 @@ export default function WelcomeOnboardingPage() {
                   {/* Content (Button + Input) - Positioned above background */}
                   <div className="relative z-10 flex items-center w-full h-full">
                     <button
+                      ref={primaryColorButtonRef}
                       type="button"
-                      data-picker-trigger // Add attribute to identify picker buttons
+                      data-picker-trigger
                       onClick={() => setActivePicker(activePicker === 'primary' ? null : 'primary')}
                       className="w-8 h-8 rounded border border-white/50 flex items-center justify-center text-white/70 flex-shrink-0" style={{ margin: '0 12px' }}
                     >
@@ -811,6 +805,7 @@ export default function WelcomeOnboardingPage() {
                    {/* Content (Button + Input) */}
                    <div className="relative z-10 flex items-center w-full h-full">
                     <button
+                      ref={secondaryColorButtonRef}
                       type="button"
                       data-picker-trigger
                       onClick={() => setActivePicker(activePicker === 'secondary' ? null : 'secondary')}
@@ -836,6 +831,7 @@ export default function WelcomeOnboardingPage() {
                    {/* Content (Button + Input) */}
                    <div className="relative z-10 flex items-center w-full h-full">
                     <button
+                      ref={accentColorButtonRef}
                       type="button"
                       data-picker-trigger
                       onClick={() => setActivePicker(activePicker === 'accent' ? null : 'accent')}
@@ -874,39 +870,38 @@ export default function WelcomeOnboardingPage() {
                   <span>Skip</span>
                 </button>
               </div>
-              {/* Conditionally render SketchPicker Popup - Positioned to the right, using slide-in-right */}
+              {/* Color Picker Popovers */}
               {activePicker === 'primary' && (
-                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}> {/* Adjust positioning */}
-                  <SketchPicker
-                    color={primaryColor || '#ffffff'}
-                    onChangeComplete={handleSketchPickerChange(setPrimaryColor)}
-                    disableAlpha={true} // Optional: disable alpha slider
-                    presetColors={[]} // Optional: remove preset colors
-                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
-                  />
-                </div>
+                <ColorPickerPopover
+                  color={primaryColor || '#ffffff'}
+                  onChange={(color) => setPrimaryColor(color)}
+                  colorName="Primary Color"
+                  isOpen={activePicker === 'primary'}
+                  onClose={() => setActivePicker(null)}
+                  triggerRef={primaryColorButtonRef}
+                />
               )}
+
               {activePicker === 'secondary' && (
-                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}>
-                  <SketchPicker
-                    color={secondaryColor || '#ffffff'}
-                    onChangeComplete={handleSketchPickerChange(setSecondaryColor)}
-                    disableAlpha={true}
-                    presetColors={[]}
-                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
-                  />
-                </div>
+                <ColorPickerPopover
+                  color={secondaryColor || '#ffffff'}
+                  onChange={(color) => setSecondaryColor(color)}
+                  colorName="Secondary Color"
+                  isOpen={activePicker === 'secondary'}
+                  onClose={() => setActivePicker(null)}
+                  triggerRef={secondaryColorButtonRef}
+                />
               )}
+
               {activePicker === 'accent' && (
-                <div ref={pickerContainerRef} className="absolute top-0 right-0 z-20 p-4 bg-[#1f1f1f] rounded-lg shadow-lg slide-in-right" style={{ transform: 'translateX(105%)' }}>
-                  <SketchPicker
-                    color={accentColor || '#ffffff'}
-                    onChangeComplete={handleSketchPickerChange(setAccentColor)}
-                    disableAlpha={true}
-                    presetColors={[]}
-                    styles={{ default: { picker: { background: '#1f1f1f', boxShadow: 'none' } } }} // Custom styles
-                  />
-                </div>
+                <ColorPickerPopover
+                  color={accentColor || '#ffffff'}
+                  onChange={(color) => setAccentColor(color)}
+                  colorName="Accent Color"
+                  isOpen={activePicker === 'accent'}
+                  onClose={() => setActivePicker(null)}
+                  triggerRef={accentColorButtonRef}
+                />
               )}
             </div>
           </>
