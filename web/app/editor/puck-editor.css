@@ -1,0 +1,37 @@
+/* Custom styles for Puck editor to match dashboard theme */
+
+/* Ensure text is white in the editor */
+.puck-editor-container {
+  color-scheme: dark;
+}
+
+/* Override Puck's default text colors to ensure visibility on dark background */
+.puck-editor-container [class*="puck-"] {
+  color: white;
+}
+
+/* Make sure form inputs and labels are visible */
+.puck-editor-container input,
+.puck-editor-container textarea,
+.puck-editor-container select,
+.puck-editor-container label {
+  color: white;
+}
+
+/* Ensure buttons have proper contrast */
+.puck-editor-container button {
+  color: white;
+}
+
+/* Make sure modal content is visible */
+.puck-editor-container [role="dialog"] {
+  color: white;
+  background-color: #181818;
+}
+
+/* Ensure dropdowns and menus are visible */
+.puck-editor-container [role="menu"],
+.puck-editor-container [role="listbox"] {
+  background-color: #181818;
+  color: white;
+}
