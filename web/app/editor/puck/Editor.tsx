@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Puck } from '@measured/puck';
 import '@measured/puck/puck.css';
 import '../puck-editor.css'; // Import our custom CSS for Puck editor
+import '../puck-force-dark.css'; // Import force dark mode CSS
 import config from './puck.config.tsx';
 
 // Initial data structure for Puck with a simple starter template
@@ -97,6 +98,53 @@ export function Editor() {
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Add dark mode class to HTML element and handle component list
+  useEffect(() => {
+    document.documentElement.classList.add('dark-mode-enabled');
+
+    // Function to expand all component items and remove dropdowns
+    const expandAllComponents = () => {
+      // Find all component list containers
+      const componentLists = document.querySelectorAll('[class*="puck-component-list"]');
+
+      componentLists.forEach(list => {
+        // Find all hidden components or collapsed sections
+        const hiddenItems = list.querySelectorAll('[aria-hidden="true"], [hidden], [style*="display: none"]');
+        const collapsedSections = list.querySelectorAll('[aria-expanded="false"]');
+
+        // Show all hidden items
+        hiddenItems.forEach((item: Element) => {
+          (item as HTMLElement).style.display = 'block';
+          (item as HTMLElement).style.visibility = 'visible';
+          (item as HTMLElement).style.height = 'auto';
+          (item as HTMLElement).style.opacity = '1';
+          item.removeAttribute('aria-hidden');
+          item.removeAttribute('hidden');
+        });
+
+        // Expand all collapsed sections
+        collapsedSections.forEach(section => {
+          section.setAttribute('aria-expanded', 'true');
+        });
+
+        // Hide dropdown toggles/buttons
+        const toggleButtons = list.querySelectorAll('[role="button"], [class*="accordion-button"], [class*="dropdown-toggle"]');
+        toggleButtons.forEach((button: Element) => {
+          (button as HTMLElement).style.display = 'none';
+        });
+      });
+    };
+
+    // Run initially and set up an interval to keep checking
+    expandAllComponents();
+    const interval = setInterval(expandAllComponents, 1000);
+
+    return () => {
+      document.documentElement.classList.remove('dark-mode-enabled');
+      clearInterval(interval);
+    };
+  }, []);
+
   // Load data from localStorage on component mount
   useEffect(() => {
     // Try to get saved data from localStorage
@@ -143,6 +191,74 @@ export function Editor() {
         data={data}
         onPublish={handlePublish}
         onChange={setData}
+        // Add custom styling for the iframe content
+        iframeHead={
+          <>
+            <style>{`
+              @import url('/app/editor/puck-iframe.css');
+              body { background-color: #010101 !important; color: white !important; }
+
+              /* Force dark backgrounds for all containers */
+              div, header, nav, aside, main, section, footer {
+                background-color: #010101 !important;
+              }
+
+              /* Force text color */
+              *, p, h1, h2, h3, h4, h5, h6, span, label {
+                color: white !important;
+              }
+
+              /* Buttons */
+              button {
+                background-color: #333333 !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+              }
+
+              /* Scrollbars */
+              ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+              }
+
+              ::-webkit-scrollbar-track {
+                background: #181818 !important;
+              }
+
+              ::-webkit-scrollbar-thumb {
+                background: #333333 !important;
+                border-radius: 4px;
+              }
+            `}</style>
+            <script>{`
+              // Force dark mode on the iframe
+              document.documentElement.style.backgroundColor = '#010101';
+              document.body.style.backgroundColor = '#010101';
+              document.body.style.color = 'white';
+            `}</script>
+          </>
+        }
+        // Custom theme configuration
+        theme={{
+          colors: {
+            background: '#010101',
+            foreground: '#ffffff',
+            border: 'rgba(255, 255, 255, 0.1)',
+            primary: '#c20023',
+            primaryLight: 'rgba(194, 0, 35, 0.1)',
+            primaryContrast: '#ffffff',
+            gray1: '#181818',
+            gray2: '#222222',
+            gray3: '#333333',
+            gray4: '#444444',
+            gray5: '#666666',
+            gray6: '#888888',
+            gray7: '#aaaaaa',
+            gray8: '#cccccc',
+            gray9: '#eeeeee',
+            gray10: '#ffffff',
+          }
+        }}
       />
     </div>
   );

@@ -1,0 +1,35 @@
+/* Custom styles for Puck editor iframe content */
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 1, 1, 1;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Ensure all text is visible */
+* {
+  color: white;
+}
+
+/* Style scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181818;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}

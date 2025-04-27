@@ -1,0 +1,169 @@
+/* Force dark mode for all elements in the Puck editor */
+
+/* Apply to all elements */
+html.dark-mode-enabled,
+html.dark-mode-enabled body,
+html.dark-mode-enabled div,
+html.dark-mode-enabled span,
+html.dark-mode-enabled applet,
+html.dark-mode-enabled object,
+html.dark-mode-enabled iframe,
+html.dark-mode-enabled h1,
+html.dark-mode-enabled h2,
+html.dark-mode-enabled h3,
+html.dark-mode-enabled h4,
+html.dark-mode-enabled h5,
+html.dark-mode-enabled h6,
+html.dark-mode-enabled p,
+html.dark-mode-enabled blockquote,
+html.dark-mode-enabled pre,
+html.dark-mode-enabled a,
+html.dark-mode-enabled abbr,
+html.dark-mode-enabled acronym,
+html.dark-mode-enabled address,
+html.dark-mode-enabled big,
+html.dark-mode-enabled cite,
+html.dark-mode-enabled code,
+html.dark-mode-enabled del,
+html.dark-mode-enabled dfn,
+html.dark-mode-enabled em,
+html.dark-mode-enabled img,
+html.dark-mode-enabled ins,
+html.dark-mode-enabled kbd,
+html.dark-mode-enabled q,
+html.dark-mode-enabled s,
+html.dark-mode-enabled samp,
+html.dark-mode-enabled small,
+html.dark-mode-enabled strike,
+html.dark-mode-enabled strong,
+html.dark-mode-enabled sub,
+html.dark-mode-enabled sup,
+html.dark-mode-enabled tt,
+html.dark-mode-enabled var,
+html.dark-mode-enabled b,
+html.dark-mode-enabled u,
+html.dark-mode-enabled i,
+html.dark-mode-enabled center,
+html.dark-mode-enabled dl,
+html.dark-mode-enabled dt,
+html.dark-mode-enabled dd,
+html.dark-mode-enabled ol,
+html.dark-mode-enabled ul,
+html.dark-mode-enabled li,
+html.dark-mode-enabled fieldset,
+html.dark-mode-enabled form,
+html.dark-mode-enabled label,
+html.dark-mode-enabled legend,
+html.dark-mode-enabled table,
+html.dark-mode-enabled caption,
+html.dark-mode-enabled tbody,
+html.dark-mode-enabled tfoot,
+html.dark-mode-enabled thead,
+html.dark-mode-enabled tr,
+html.dark-mode-enabled th,
+html.dark-mode-enabled td,
+html.dark-mode-enabled article,
+html.dark-mode-enabled aside,
+html.dark-mode-enabled canvas,
+html.dark-mode-enabled details,
+html.dark-mode-enabled embed,
+html.dark-mode-enabled figure,
+html.dark-mode-enabled figcaption,
+html.dark-mode-enabled footer,
+html.dark-mode-enabled header,
+html.dark-mode-enabled hgroup,
+html.dark-mode-enabled menu,
+html.dark-mode-enabled nav,
+html.dark-mode-enabled output,
+html.dark-mode-enabled ruby,
+html.dark-mode-enabled section,
+html.dark-mode-enabled summary,
+html.dark-mode-enabled time,
+html.dark-mode-enabled mark,
+html.dark-mode-enabled audio,
+html.dark-mode-enabled video {
+  color: white !important;
+}
+
+/* Base elements */
+html.dark-mode-enabled body {
+  background-color: #010101 !important;
+  color: white !important;
+}
+
+/* Force dark backgrounds for all containers */
+html.dark-mode-enabled div,
+html.dark-mode-enabled header,
+html.dark-mode-enabled nav,
+html.dark-mode-enabled aside,
+html.dark-mode-enabled main,
+html.dark-mode-enabled section,
+html.dark-mode-enabled footer {
+  background-color: #010101 !important;
+}
+
+/* Form elements */
+html.dark-mode-enabled input,
+html.dark-mode-enabled textarea,
+html.dark-mode-enabled select {
+  background-color: #222222 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Buttons */
+html.dark-mode-enabled button {
+  background-color: #333333 !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark-mode-enabled button[class*="primary"] {
+  background-color: #c20023 !important;
+}
+
+/* Dropdowns and menus */
+html.dark-mode-enabled [role="dialog"],
+html.dark-mode-enabled [role="menu"],
+html.dark-mode-enabled [role="listbox"] {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Tables */
+html.dark-mode-enabled table,
+html.dark-mode-enabled th,
+html.dark-mode-enabled td {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark-mode-enabled th,
+html.dark-mode-enabled td {
+  background-color: #181818 !important;
+  color: white !important;
+}
+
+/* Links */
+html.dark-mode-enabled a {
+  color: #c20023 !important;
+}
+
+/* Scrollbars */
+html.dark-mode-enabled ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark-mode-enabled ::-webkit-scrollbar-track {
+  background: #181818 !important;
+}
+
+html.dark-mode-enabled ::-webkit-scrollbar-thumb {
+  background: #333333 !important;
+  border-radius: 4px;
+}
+
+html.dark-mode-enabled ::-webkit-scrollbar-thumb:hover {
+  background: #444444 !important;
+}

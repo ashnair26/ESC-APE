@@ -1,37 +1,261 @@
 /* Custom styles for Puck editor to match dashboard theme */
 
-/* Ensure text is white in the editor */
+/* Global dark mode for Puck editor */
 .puck-editor-container {
   color-scheme: dark;
+  --puck-color-background: #010101 !important;
+  --puck-color-foreground: #ffffff !important;
+  --puck-color-border: rgba(255, 255, 255, 0.1) !important;
+  --puck-color-primary: #c20023 !important;
+  --puck-color-primary-light: rgba(194, 0, 35, 0.1) !important;
+  --puck-color-primary-contrast: #ffffff !important;
+  --puck-color-gray-1: #181818 !important;
+  --puck-color-gray-2: #222222 !important;
+  --puck-color-gray-3: #333333 !important;
+  --puck-color-gray-4: #444444 !important;
+  --puck-color-gray-5: #666666 !important;
+  --puck-color-gray-6: #888888 !important;
+  --puck-color-gray-7: #aaaaaa !important;
+  --puck-color-gray-8: #cccccc !important;
+  --puck-color-gray-9: #eeeeee !important;
+  --puck-color-gray-10: #ffffff !important;
 }
 
-/* Override Puck's default text colors to ensure visibility on dark background */
-.puck-editor-container [class*="puck-"] {
-  color: white;
+/* Force all elements to use dark background */
+.puck-editor-container * {
+  background-color: #010101;
 }
 
-/* Make sure form inputs and labels are visible */
+/* Override for specific elements that need different backgrounds */
+.puck-editor-container [class*="puck-component-item"],
+.puck-editor-container [class*="puck-field-group"],
 .puck-editor-container input,
 .puck-editor-container textarea,
 .puck-editor-container select,
-.puck-editor-container label {
-  color: white;
-}
-
-/* Ensure buttons have proper contrast */
-.puck-editor-container button {
-  color: white;
-}
-
-/* Make sure modal content is visible */
-.puck-editor-container [role="dialog"] {
-  color: white;
-  background-color: #181818;
-}
-
-/* Ensure dropdowns and menus are visible */
+.puck-editor-container [role="dialog"],
 .puck-editor-container [role="menu"],
-.puck-editor-container [role="listbox"] {
-  background-color: #181818;
-  color: white;
+.puck-editor-container [role="listbox"],
+.puck-editor-container [class*="puck-dropdown"],
+.puck-editor-container button[class*="puck-button-primary"],
+.puck-editor-container button[class*="puck-button-secondary"] {
+  background-color: initial;
+}
+
+/* Main editor layout */
+.puck-editor-container [class*="puck-root"],
+.puck-editor-container div[class*="puck-root"],
+.puck-editor-container > div,
+.puck-editor-container > div > div {
+  background-color: #010101 !important;
+  color: white !important;
+}
+
+/* Header */
+.puck-editor-container [class*="puck-header"],
+.puck-editor-container header,
+.puck-editor-container div[class*="Header"],
+.puck-editor-container div[role="banner"],
+.puck-editor-container nav,
+.puck-editor-container div[class*="Toolbar"] {
+  background-color: #010101 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Sidebar */
+.puck-editor-container [class*="puck-sidebar"],
+.puck-editor-container aside,
+.puck-editor-container div[class*="Sidebar"],
+.puck-editor-container div[class*="LeftPanel"],
+.puck-editor-container div[class*="RightPanel"],
+.puck-editor-container div[role="complementary"] {
+  background-color: #010101 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Component list */
+.puck-editor-container [class*="puck-component-list"] {
+  background-color: #010101 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Remove dropdowns/accordions in component list */
+.puck-editor-container [class*="puck-component-list"] [role="button"],
+.puck-editor-container [class*="puck-component-list"] [aria-expanded],
+.puck-editor-container [class*="puck-component-list"] [class*="accordion"],
+.puck-editor-container [class*="puck-component-list"] [class*="Accordion"],
+.puck-editor-container [class*="puck-component-list"] [class*="dropdown"],
+.puck-editor-container [class*="puck-component-list"] [class*="Dropdown"] {
+  display: none !important;
+}
+
+/* Force all component items to be visible */
+.puck-editor-container [class*="puck-component-list"] [class*="puck-component-item"],
+.puck-editor-container [class*="puck-component-list"] [role="listitem"],
+.puck-editor-container [class*="puck-component-list"] [class*="ComponentItem"] {
+  display: block !important;
+  visibility: visible !important;
+  height: auto !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  margin-bottom: 8px !important;
+}
+
+/* Component items */
+.puck-editor-container [class*="puck-component-item"] {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  padding: 12px !important;
+  border-radius: 4px !important;
+}
+
+.puck-editor-container [class*="puck-component-item"]:hover {
+  background-color: #222222 !important;
+}
+
+/* Fields panel */
+.puck-editor-container [class*="puck-fields"] {
+  background-color: #010101 !important;
+  color: white !important;
+}
+
+/* Field groups */
+.puck-editor-container [class*="puck-field-group"] {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Field labels */
+.puck-editor-container [class*="puck-field-label"] {
+  color: white !important;
+}
+
+/* Form inputs */
+.puck-editor-container input,
+.puck-editor-container textarea,
+.puck-editor-container select {
+  background-color: #222222 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.puck-editor-container input:focus,
+.puck-editor-container textarea:focus,
+.puck-editor-container select:focus {
+  border-color: #c20023 !important;
+  outline: none !important;
+}
+
+/* Buttons */
+.puck-editor-container button {
+  color: white !important;
+}
+
+.puck-editor-container button[class*="puck-button-primary"] {
+  background-color: #c20023 !important;
+}
+
+.puck-editor-container button[class*="puck-button-secondary"] {
+  background-color: #333333 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dropdowns and menus */
+.puck-editor-container [role="dialog"],
+.puck-editor-container [role="menu"],
+.puck-editor-container [role="listbox"],
+.puck-editor-container [class*="puck-dropdown"] {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+/* Dropdown items */
+.puck-editor-container [class*="puck-dropdown-item"] {
+  color: white !important;
+}
+
+.puck-editor-container [class*="puck-dropdown-item"]:hover {
+  background-color: #222222 !important;
+}
+
+/* Tabs */
+.puck-editor-container [class*="puck-tabs"] {
+  background-color: #010101 !important;
+}
+
+.puck-editor-container [class*="puck-tab"] {
+  color: #aaaaaa !important;
+}
+
+.puck-editor-container [class*="puck-tab-active"] {
+  color: white !important;
+  border-bottom-color: #c20023 !important;
+}
+
+/* Preview area */
+.puck-editor-container [class*="puck-preview"] {
+  background-color: #010101 !important;
+}
+
+/* Drag and drop */
+.puck-editor-container [class*="puck-drop-zone"] {
+  background-color: rgba(194, 0, 35, 0.1) !important;
+  border: 1px dashed rgba(194, 0, 35, 0.5) !important;
+}
+
+.puck-editor-container [class*="puck-drop-zone-active"] {
+  background-color: rgba(194, 0, 35, 0.2) !important;
+}
+
+/* Modals */
+.puck-editor-container [class*="puck-modal"] {
+  background-color: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.puck-editor-container [class*="puck-modal-header"] {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.puck-editor-container [class*="puck-modal-footer"] {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tables */
+.puck-editor-container table {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.puck-editor-container th,
+.puck-editor-container td {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.puck-editor-container tr:hover {
+  background-color: #222222 !important;
+}
+
+/* Scrollbars */
+.puck-editor-container ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.puck-editor-container ::-webkit-scrollbar-track {
+  background: #181818;
+}
+
+.puck-editor-container ::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+.puck-editor-container ::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }
