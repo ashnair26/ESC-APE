@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
+  experimental: {
+    // Add any experimental features here
+  },
   async rewrites() {
     return [
       {
