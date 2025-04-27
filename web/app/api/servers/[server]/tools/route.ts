@@ -61,6 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             console.error(`[API Route] MCP Server Response Data:`, error.response.data);
         } else if (error.request) {
             // The request was made but no response was received
+            return NextResponse.json(
                 { success: false, error: `Request to ${serverName} server timed out.` },
                 { status: 504 } // Gateway Timeout
             );

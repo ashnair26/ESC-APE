@@ -79,22 +79,12 @@ export default function CreatorHubLayout({
           <Menu as="div" className="relative">
             <Menu.Button className="-m-1.5 flex items-center p-1.5">
               <span className="sr-only">Open user menu</span>
-              {user?.avatar ? (
-                <Image
-                  src={user.avatar}
-                  alt="User avatar"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-full"
-                />
-              ) : (
-                <div className="h-8 w-8 rounded-full bg-gray-800 flex items-center justify-center">
-                  <span className="text-sm text-white">
-                    {user?.email?.address ? user.email.address.charAt(0).toUpperCase() :
-                     user?.wallet?.address ? user.wallet.address.charAt(2).toUpperCase() : 'U'}
-                  </span>
-                </div>
-              )}
+              <div className="h-8 w-8 rounded-full bg-gray-800 flex items-center justify-center">
+                <span className="text-sm text-white">
+                  {user?.email?.address ? user.email.address.charAt(0).toUpperCase() :
+                   user?.wallet?.address ? user.wallet.address.charAt(2).toUpperCase() : 'U'}
+                </span>
+              </div>
               <span className="flex items-center">
                 <span
                   className="ml-2 text-sm font-semibold leading-6 text-white"

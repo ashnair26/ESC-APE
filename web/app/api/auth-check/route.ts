@@ -118,9 +118,9 @@ export async function POST(req: NextRequest) {
       console.error('[Auth Check] Error checking member status:', memberError);
     }
 
-    if (memberData && memberData.community) {
-      console.log(`[Auth Check] User is a Member of ${memberData.community.slug}. Redirecting.`);
-      return NextResponse.json({ redirect: `/community/${memberData.community.slug}` });
+    if (memberData && memberData.community && memberData.community[0]?.slug) {
+      console.log(`[Auth Check] User is a Member of ${memberData.community[0].slug}. Redirecting.`);
+      return NextResponse.json({ redirect: `/community/${memberData.community[0].slug}` });
     }
 
     // 6. New User - Redirect to Onboarding

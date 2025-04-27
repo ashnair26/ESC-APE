@@ -58,23 +58,22 @@ export async function verifyAdminToken(request: NextRequest): Promise<AdminToken
   }
 }
 
-// Removed createAdminToken function as we will use jose directly in the login route
-// /**
-//  * Create a new admin token
-//  * @param payload The admin token payload
-//  * @param expiresIn The token expiry time (default: 24h)
-//  * @returns The JWT token
-//  */
-// export function createAdminToken(
-//   payload: Omit<AdminTokenPayload, 'iat' | 'exp'>,
-//   expiresIn: string = '24h'
-// ): string {
-//   return jwt.sign(
-//     {
-//       ...payload,
-//       iat: Math.floor(Date.now() / 1000),
-//     },
-//     JWT_SECRET,
-//     { expiresIn }
-//   );
-// }
+/**
+ * Create a new admin token
+ * @param payload The admin token payload
+ * @param expiresIn The token expiry time (default: 24h)
+ * @returns The JWT token
+ */
+export function createAdminToken(
+  payload: Omit<AdminTokenPayload, 'iat' | 'exp'>,
+  expiresIn: string = '24h'
+): string {
+  return jwt.sign(
+    {
+      ...payload,
+      iat: Math.floor(Date.now() / 1000),
+    },
+    JWT_SECRET,
+    { expiresIn }
+  );
+}
