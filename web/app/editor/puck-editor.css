@@ -103,17 +103,20 @@
   margin-bottom: 8px !important;
 }
 
-/* Component items */
+/* Component items - matching Back to Landing button style */
 .puck-editor-container [class*="puck-component-item"] {
-  background-color: #181818 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
   color: white !important;
   padding: 12px !important;
-  border-radius: 4px !important;
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
+  transition-property: background-color !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 150ms !important;
 }
 
 .puck-editor-container [class*="puck-component-item"]:hover {
-  background-color: #222222 !important;
+  background-color: rgba(255, 255, 255, 0.1) !important; /* white/10 in tailwind */
 }
 
 /* Fields panel */
@@ -122,10 +125,11 @@
   color: white !important;
 }
 
-/* Field groups */
+/* Field groups - matching Back to Landing button style */
 .puck-editor-container [class*="puck-field-group"] {
-  background-color: #181818 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
 }
 
 /* Field labels */
@@ -133,19 +137,30 @@
   color: white !important;
 }
 
-/* Form inputs */
+/* Form inputs - matching Back to Landing button style */
 .puck-editor-container input,
 .puck-editor-container textarea,
 .puck-editor-container select {
-  background-color: #222222 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
   color: white !important;
+  transition-property: background-color, border-color !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 150ms !important;
+}
+
+.puck-editor-container input:hover,
+.puck-editor-container textarea:hover,
+.puck-editor-container select:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 .puck-editor-container input:focus,
 .puck-editor-container textarea:focus,
 .puck-editor-container select:focus {
   border-color: #c20023 !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
   outline: none !important;
 }
 
@@ -154,22 +169,34 @@
   color: white !important;
 }
 
+/* Primary buttons - keep the red background */
 .puck-editor-container button[class*="puck-button-primary"] {
   background-color: #c20023 !important;
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
 }
 
+/* Secondary buttons - match Back to Landing button style */
 .puck-editor-container button[class*="puck-button-secondary"] {
-  background-color: #333333 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
+  transition-property: background-color !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-duration: 150ms !important;
 }
 
-/* Dropdowns and menus */
+.puck-editor-container button[class*="puck-button-secondary"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important; /* white/10 in tailwind */
+}
+
+/* Dropdowns and menus - matching Back to Landing button style */
 .puck-editor-container [role="dialog"],
 .puck-editor-container [role="menu"],
 .puck-editor-container [role="listbox"],
 .puck-editor-container [class*="puck-dropdown"] {
   background-color: #181818 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
   color: white !important;
 }
 
@@ -211,10 +238,11 @@
   background-color: rgba(194, 0, 35, 0.2) !important;
 }
 
-/* Modals */
+/* Modals - matching Back to Landing button style */
 .puck-editor-container [class*="puck-modal"] {
   background-color: #181818 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important; /* white/20 in tailwind */
+  border-radius: 0.375rem !important; /* rounded-md in tailwind */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
