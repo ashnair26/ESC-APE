@@ -6,10 +6,7 @@ This document outlines the foundational architecture, guiding principles, and de
 
 ## 🎯 Purpose
 ESCAPE empowers creators to:
-- Build their own interactive IP worlds without writing code
-- Manage gated content, quests, and NFT evolutions
-- Connect directly with their Farcaster and X.com followers
-- Monetize through staged NFT drops, affiliate programs, and lore-based progression
+- ESCAPE is designed to integrate with Towns Protocol-native spaces for decentralized community management, while simultaneously supporting Farcaster and X for social reach. Our architecture layers lore, quests, and NFT progression seamlessly on top of Towns’ base infrastructure through wallet authentication and metadata-driven interactions.
 
 The platform is intended to operate as a hybrid between:
 - **No-code publishing tools** (like Webflow or Mighty Networks)
@@ -52,13 +49,25 @@ This progression rewards the most loyal community members while creating a susta
 | State / Auth | Privy (Wallet + X + Farcaster)      |
 | Database     | Supabase                            |
 | CMS          | Sanity (creator-managed content UI) |
-| Blockchain   | BASE (ERC-721 NFT support)          |
+| Blockchain   | s (ERC-721 NFT support)          |
 
 *Note: Supabase Model Context Protocol (MCP) should be used when implementing the database schema*
 
 Optional:
 - Alchemy (NFT event listeners / contract triggers)
 - Dune (on-chain analytics dashboards)
+
+
+
+## NFT Evolution
+
+Portal NFTs: In the future, Portals will allow two communities to form shared Spaces, with lore mechanics and special NFT effects triggered across communities.
+
+[World A] + [World B] ➔ [Portal NFT] ➔ [Shared Lore Layer].
+
+## Lore Layer architecture:
+
+ESC/APE interfaces externally to Town Spaces via wallet-based permissions without modifying Towns’ Diamond contracts, ensuring sovereignty and upgrade safety.”
 
 ---
 
@@ -91,7 +100,7 @@ ESCAPE/
 │   │   ├── server.py         # Main server implementation
 │   │   ├── commands.py       # Git command implementations
 │   │   └── tests/            # Tests for the Git server
-│   ├── sanity/               # Sanity CMS MCP server
+│   ├── Sanity/               # Sanity CMS MCP server
 │   │   ├── __init__.py
 │   │   ├── server.py         # Main server implementation
 │   │   ├── client.py         # Sanity client implementation
@@ -474,62 +483,61 @@ The admin authentication system integrates with the project's MCP architecture:
 
 ## 🧩 Platform Modules
 
-1. **Dashboard (Creator Panel)**
-   - NFT mint tool
-   - Stage configurator (1–13 stage support)
-   - Quest + Grail manager
-   - Whitelist logic builder
-   - Analytics and user activity views (detailed metrics and insights)
-   - All creator operations happen through this no-code admin interface
+1. **Creator Dashboard (Lore Hub)**
+   - Mint tool for NFT-based access passes and evolving story artifacts
+   - Stage configurator for lore-driven NFT upgrades (1–13 stages)
+   - Quest + Grail manager integrated into Towns Spaces
+   - Analytics and user insights respecting Towns’ privacy-first ethos
+   - All creator operations happen via a no-code panel layered onto their Town
 
 2. **Comic Reader + Lore Engine**
    - Pages or Panels mode (toggle)
-   - Grails placed per panel with lore hooks
-   - Lore submissions + canon voting window
-   - Hall of Memories for top community stories
+   - Grail discovery hooks into Towns metadata per space
+   - Lore submissions + canon voting windows tied to Town governance
+   - Hall of Memories: a shared library for top community lore voted by members
 
-3. **Social Feed**
-   - Private Farcaster-style feed per creator community
-   - Cast manually or auto from events (page, mint, quest)
-   - "Share to X" supported on all user actions
+3. **Towns Social Layer** (Optional Future Upgrade)
+   - Private broadcast feeds (opt-in) within Towns
+   - Cast events (page unlocked, quest completed) into Town updates
+   - “Share to Farcaster or X” extensions for external amplification
+- Feeds enhance — but never replace — Towns’ core chat-first UX
 
-4. **Quests + Gamification**
-   - Daily, Project, Lore, and Proof quests
-   - XP, level progression, unlockable stages
-   - Quest completions linked to NFT evolution paths
+4. **Quests + Worldbuilding Gamification**
+   - Native Towns Quest engine extension: Daily, Project, Lore, and Proof quests
+   - XP + Reputation tied into Towns’ existing member scores
+   - Quest completions trigger lore unlocks, NFT upgrades, and access rights
 
 5. **NFT Evolution Engine**
-   - ERC-721 with metadata for stages 1–13
-   - Evolution tied to creator-configured conditions
-   - Password gate, quest proofs, and grail clues as triggers
-   - NFT evolution unlocks new content and whitelist status
-   - Detailed implementation expanded in NFT Evolution Logic section below
-
+   - ERC-721 dynamic metadata NFTs
+   - Evolution linked to actions inside the Town (quests, portal traversals, lore creation)
+   - Creator-set progression rules, fully optional, fully local to their space
+   - Whitelist, rewards, special access tied to NFT evolution stages
+   
 6. **Affiliate System**
-   - Commission on subscription and NFT sales
-   - Ref codes linked to social login and tracked in Supabase
+   - Referrals tied to wallet-linked reputation scores
+   - Commission rewards for growing a Town or lore ecosystem
+   - Fully opt-in; no protocol extraction
 
 7. **Theming & Onboarding**
-   - Creator selects 4 theme colors (60/30/10 + error) using color token system
+- Simple wallet/Privy onboarding flow
+- Creator selects 4 theme colors (60/30/10 + error) using color token system
    - Interactive color palette shuffler for quick theme exploration
    - Tailwind theme tokens auto-generated per creator
    - Dashboard grid is bento-based and fully responsive
    - Implements accessibility standards for all interfaces
+   - ESC/APE grid layouts layer on top of Town Spaces, keeping the UX Town-native (EXPLORING IF POSSIBLE)
 
-8. **Analytics & Insights Platform**
-   - Comprehensive community metrics and engagement data
-   - Visual dashboards with actionable insights
-   - User-level and aggregate performance tracking
-   - Sentiment analysis and geographic distribution
-   - Complete details in Analytics Overview section below
 
-9. **Progress Tracking System**
-   - Dynamic user journey visualization
-   - Personalized next steps and guidance
-   - Creator-configured hints and milestones
-   - Real-time progression feedback
-   - Detailed implementation in Progress Tracking section below
+8. **Analytics & Insights Platform (Respecting Privacy)**
+   - Community-driven metrics inside Towns: quest participation, NFT evolution stages, lore votes
+   - All analytics aggregated anonymously; wallet addresses kept private
+- Visual dashboards showing collective progress, not individual surveillance
 
+9. **Journey & Progression Tracker**
+   - Visualize lore progression for each user without breaching Towns’ autonomy
+   - Users unlock new spaces, quests, and lore as they progress
+- Designed to inspire exploration, not control behavior
+-
 ## 🔌 Service Integration & Boundaries
 
 ### Core Service Responsibilities
