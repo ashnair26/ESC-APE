@@ -7,15 +7,15 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-      mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
-      lemonmilk: ['Lemonmilk', 'ui-sans-serif', 'system-ui'],
-      manlymebb: ['Inter', 'ui-sans-serif', 'system-ui'],
+      sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji'],
+      mono: ['SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
+      lemonmilk: ['Lemonmilk', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+      manlymebb: ['ManlyMenBB', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
       // Theme font families
-      'escape-heading': ['Lemonmilk', 'ui-sans-serif', 'system-ui'],
-      'escape-body': ['Inter', 'ui-sans-serif', 'system-ui'],
-      'default-heading': ['var(--font-inter)', 'ui-sans-serif', 'system-ui'],
-      'default-body': ['var(--font-inter)', 'ui-sans-serif', 'system-ui'],
+      'escape-heading': ['Lemonmilk', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+      'escape-body': ['-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+      'default-heading': ['-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+      'default-body': ['-apple-system', 'BlinkMacSystemFont', 'system-ui'],
     },
     extend: {
       colors: {

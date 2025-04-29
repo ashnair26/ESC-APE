@@ -279,7 +279,13 @@ type Components = {
 
 // Create the Puck configuration
 const config: Config<Components> = {
-  // No categories - all components will be displayed in a flat list
+  // Use a single category for all components
+  categories: [
+    {
+      name: 'All Components',
+      components: ['HeroBlock', 'IPShowcaseBlock', 'CommunityHubBlock', 'NFTDisplayBlock', 'CTABlock']
+    }
+  ],
 
   components: {
     HeroBlock: {

@@ -81,25 +81,15 @@
   flex-direction: column !important;
 }
 
-/* Remove dropdowns/accordions in component list */
-.puck-editor-container [class*="puck-component-list"] [role="button"],
-.puck-editor-container [class*="puck-component-list"] [aria-expanded],
-.puck-editor-container [class*="puck-component-list"] [class*="accordion"],
-.puck-editor-container [class*="puck-component-list"] [class*="Accordion"],
-.puck-editor-container [class*="puck-component-list"] [class*="dropdown"],
-.puck-editor-container [class*="puck-component-list"] [class*="Dropdown"] {
-  display: none !important;
+/* Modify dropdowns/accordions in component list to be always expanded */
+.puck-editor-container [class*="puck-component-list"] [aria-expanded="false"] {
+  aria-expanded: true;
 }
 
-/* Force all component items to be visible */
+/* Make component items visible but preserve drag functionality */
 .puck-editor-container [class*="puck-component-list"] [class*="puck-component-item"],
 .puck-editor-container [class*="puck-component-list"] [role="listitem"],
 .puck-editor-container [class*="puck-component-list"] [class*="ComponentItem"] {
-  display: block !important;
-  visibility: visible !important;
-  height: auto !important;
-  opacity: 1 !important;
-  overflow: visible !important;
   margin-bottom: 8px !important;
 }
 

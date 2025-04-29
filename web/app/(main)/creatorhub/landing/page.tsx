@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the Viewer component with no SSR to avoid hydration issues
+const PuckViewer = dynamic(() => import('../../../editor/puck/Viewer'), { ssr: false });
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center justify-center mt-12">
-      <h1 className="text-3xl font-normal mb-4" style={{ fontFamily: 'League Spartan, sans-serif' }}>
-        Landing Page
-      </h1>
-      <p className="text-center text-gray-400 max-w-lg mb-8">
-        This is the landing page of your CreatorHub.
-      </p>
+    <div className="landing-page-container">
+      {/* Render the Puck Viewer component to display the landing page content */}
+      <PuckViewer />
     </div>
   );
 }

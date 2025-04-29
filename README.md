@@ -169,4 +169,7 @@ MIT License (with open future extensions for Towns-based community tools).
 - [Landing Page Task Breakdown](./docs/Landing_task.md)
 
 
+![Repo Visibility](https://img.shields.io/github/repo-status/ashnair26/ESC-APE)
+
+[![GitHub license](https://img.shields.io/github/license/ashnair26/ESC-APE)](https://github.com/ashnair26/ESC-APE)
 

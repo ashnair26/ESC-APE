@@ -2,7 +2,7 @@
 
 /* Style for navbar links */
 .admin-navbar a {
-  font-family: 'League Spartan', sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   font-weight: 400 !important; /* Regular weight */
   text-transform: none !important; /* Ensure text is not transformed to uppercase */
   font-size: 14px !important; /* Match UI Dashboard font size */

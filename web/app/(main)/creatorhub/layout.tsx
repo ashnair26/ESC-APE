@@ -53,6 +53,16 @@ export default function CreatorHubLayout({
             className="w-auto h-auto"
             priority
           />
+
+          {/* CUSTOMISE button with navbar-matching outline */}
+          <Link
+            href="/editor"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-6 px-4 py-1.5 border border-white/10 text-white text-sm hover:bg-white/5 transition-colors rounded-md"
+          >
+            CUSTOMISE
+          </Link>
         </div>
 
         {/* UI Components Navbar with custom styling */}

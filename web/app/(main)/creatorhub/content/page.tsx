@@ -5,13 +5,13 @@ import React from 'react';
 export default function ContentPage() {
   return (
     <div className="flex flex-col items-center justify-center mt-12">
-      <h1 className="text-3xl font-normal mb-4" style={{ fontFamily: 'League Spartan, sans-serif' }}>
+      <h1 className="text-3xl font-normal mb-4">
         Content Page
       </h1>
       <p className="text-center text-gray-400 max-w-lg mb-8">
         This is the content page of your CreatorHub where you can manage your content.
       </p>
-      
+
       {/* Content management section */}
       <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-6">
@@ -22,7 +22,7 @@ export default function ContentPage() {
             Create New Content
           </button>
         </div>
-        
+
         {/* Content list */}
         <div className="space-y-4">
           {/* Sample content items */}

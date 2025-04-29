@@ -2,8 +2,11 @@
   Custom Font Declarations
 */
 
-/* Import League Spartan font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/*
+ * San Francisco Font
+ * We use the system font stack that includes San Francisco on Apple devices
+ * This is the recommended approach since San Francisco is not freely distributable
+ */
 
 @font-face {
   font-family: 'Lemonmilk';
@@ -23,7 +26,7 @@
 
 /* Define font variables */
 :root {
-  --font-league-spartan: 'League Spartan', sans-serif;
+  --font-sf: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
 /* Add more @font-face declarations as needed for different weights and styles */
