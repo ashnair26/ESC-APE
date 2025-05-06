@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import BrutalistButton from './BrutalistButton';
+import Button from './Button';
 
 interface StageCardProps {
   stageNumber: number;
@@ -123,25 +123,21 @@ const StageCard: React.FC<StageCardProps> = ({
                   </p>
                 )}
               </div>
-              <BrutalistButton
-                color="red"
-                className="font-lemonmilk"
-                style={{ backgroundColor: '#c20023', borderColor: '#000000' }}
+              <Button
+                className="font-normal"
                 onClick={handleUnlock}
               >
-                UNLOCK
-              </BrutalistButton>
+                Unlock
+              </Button>
             </div>
           )}
 
           {(!isLocked || isUnlocked) && (
-            <BrutalistButton
-              color="green"
-              className="font-lemonmilk"
-              style={{ backgroundColor: '#00cc44', borderColor: '#000000' }}
+            <Button
+              className="font-normal"
             >
-              ENTER STAGE
-            </BrutalistButton>
+              Enter Stage
+            </Button>
           )}
         </div>
       </div>

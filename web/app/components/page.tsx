@@ -16,6 +16,8 @@ import {
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { FrostedButton } from '@/components/ui/FrostedButton';
+import { LucideIconsDemo } from '@/components/ui/LucideIconsDemo';
 import Alert from '@/components/ui/Alert';
 import ProgressCard from '@/components/ui/ProgressCard';
 import Stat from '@/components/ui/Stat';
@@ -23,7 +25,7 @@ import BentoGrid from '@/components/ui/BentoGrid';
 import BentoBox from '@/components/ui/BentoBox';
 import Navbar from '@/components/ui/Navbar';
 import ComicEntryCard from '@/components/ui/ComicEntryCard';
-import BrutalistButton from '@/components/ui/BrutalistButton';
+
 import StageCard from '@/components/ui/StageCard';
 
 export default function ComponentsPage() {
@@ -39,6 +41,7 @@ export default function ComponentsPage() {
     { id: 'bento', name: 'Bento Grid' },
     { id: 'navbar', name: 'Navbar' },
     { id: 'comic', name: 'Comic Components' },
+    { id: 'icons', name: 'Lucide Icons' },
   ];
 
   return (
@@ -161,88 +164,33 @@ export default function ComponentsPage() {
               <h2 className="text-lg font-medium text-gray-900 dark:text-white">Buttons</h2>
 
               <div className="space-y-4">
-                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Variants</h3>
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button</h3>
                 <div className="flex flex-wrap gap-4">
-                  <Button variant="primary">Primary</Button>
-                  <Button variant="secondary">Secondary</Button>
-                  <Button variant="accent">Accent</Button>
-                  <Button variant="success">Success</Button>
-                  <Button variant="error">Error</Button>
-                  <Button variant="warning">Warning</Button>
-                  <Button variant="info">Info</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="ghost">Ghost</Button>
+                  <Button>Default Button</Button>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-md font-medium text-gray-900 dark:text-white">Button Sizes</h3>
-                <div className="flex flex-wrap items-center gap-4">
-                  <Button variant="primary" size="xs">Extra Small</Button>
-                  <Button variant="primary" size="sm">Small</Button>
-                  <Button variant="primary" size="md">Medium</Button>
-                  <Button variant="primary" size="lg">Large</Button>
-                  <Button variant="primary" size="xl">Extra Large</Button>
-                </div>
-              </div>
+
 
               <div className="space-y-4">
                 <h3 className="text-md font-medium text-gray-900 dark:text-white">Button States</h3>
                 <div className="flex flex-wrap gap-4">
-                  <Button variant="primary">Normal</Button>
-                  <Button variant="primary" disabled>Disabled</Button>
-                  <Button variant="primary" loading>Loading</Button>
-                  <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />}>With Icon</Button>
-                  <Button variant="primary" iconRight={<HomeIcon className="h-5 w-5" />}>Icon Right</Button>
-                  <Button variant="primary" icon={<HomeIcon className="h-5 w-5" />} iconOnly />
+                  <Button>Normal</Button>
+                  <Button disabled>Disabled</Button>
+                  <Button loading>Loading</Button>
+                  <Button icon={<HomeIcon className="h-5 w-5" />}>With Icon</Button>
+                  <Button iconRight={<HomeIcon className="h-5 w-5" />}>Icon Right</Button>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-md font-medium text-gray-900 dark:text-white">Brutalist Buttons</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Brutalist design emphasizes raw, unpolished aesthetics with bold colors, sharp contrasts, and unconventional layouts.
-                </p>
-
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Colors</h4>
-                    <div className="flex flex-wrap gap-4">
-                      <BrutalistButton color="red">Red</BrutalistButton>
-                      <BrutalistButton color="blue">Blue</BrutalistButton>
-                      <BrutalistButton color="yellow">Yellow</BrutalistButton>
-                      <BrutalistButton color="green">Green</BrutalistButton>
-                      <BrutalistButton color="black">Black</BrutalistButton>
-                      <BrutalistButton color="white">White</BrutalistButton>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sizes</h4>
-                    <div className="flex flex-wrap items-center gap-4">
-                      <BrutalistButton color="red" size="sm">Small</BrutalistButton>
-                      <BrutalistButton color="red" size="md">Medium</BrutalistButton>
-                      <BrutalistButton color="red" size="lg">Large</BrutalistButton>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Styles</h4>
-                    <div className="flex flex-wrap gap-4">
-                      <BrutalistButton color="blue" skew>Skewed</BrutalistButton>
-                      <BrutalistButton color="yellow" noisy>Noisy</BrutalistButton>
-                      <BrutalistButton color="green" skew noisy>Skewed & Noisy</BrutalistButton>
-                      <BrutalistButton color="black" disabled>Disabled</BrutalistButton>
-                      <BrutalistButton color="red" loading>Loading</BrutalistButton>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comic Read Button</h4>
-                    <BrutalistButton color="red" style={{ backgroundColor: '#c20023', borderColor: '#000000' }}>READ NOW</BrutalistButton>
-                  </div>
+                <h3 className="text-md font-medium text-gray-900 dark:text-white">Frosted Button</h3>
+                <div className="flex flex-wrap gap-4">
+                  <FrostedButton>Frosted Button</FrostedButton>
                 </div>
               </div>
+
+
             </div>
           )}
 
@@ -649,6 +597,21 @@ export default function ComponentsPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'icons' && (
+            <div className="space-y-8">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Lucide Icons</h2>
+
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Lucide is a community-maintained fork of Feather Icons, providing a beautiful set of open-source icons.
+                  These icons are designed to be simple, consistent, and customizable.
+                </p>
+
+                <LucideIconsDemo className="mt-6" />
               </div>
             </div>
           )}
